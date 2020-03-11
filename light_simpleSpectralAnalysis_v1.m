@@ -70,6 +70,7 @@ for nS=1:length(List_Subj)
     % re-reference to the average
     data=data-repmat(mean(data(:,:),1),[size(data,1), 1]);
     
+   
     % loop across electrodes
     EEG_channels=hdr.label;
     EEG_channels(match_str(EEG_channels,{'x_dir','y_dir','z_dir','ECG1','ECG2','EOG R','EOG L'}))=[];
@@ -99,6 +100,10 @@ for nS=1:length(List_Subj)
             end
         end
     end
+    
+     % plot data
+    figure; imagesc(data);
+    
 end
 
 %%
@@ -272,34 +277,34 @@ for nch=1:length(my_channels)
     end
 end
 
-%%
-theta_band=[7.5 11];
-sigma_band=[11 15];
-for nplot=1:4
-    figure;
-    for ncond=1:2
-        subplot(2,3,3-(ncond));
-        topo=squeeze(nanmedian(nanmean(pow_fix(condition==ncond-1,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1));
-        topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
-        title(sprintf('%s - %s',condition_names{ncond},'Theta'))
-        
-        subplot(2,3,6-(ncond));
-        topo=squeeze(nanmedian(nanmean(pow_fix(condition==ncond-1,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1));
-        topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
-        title(sprintf('%s - %s',condition_names{ncond},'Alpha'))
-    end
-    subplot(2,3,3);
-    topo=squeeze(nanmedian(nanmean(pow_fix(condition==1,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1))-...
-        squeeze(nanmedian(nanmean(pow_fix(condition==0,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1));
-    topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
-    title(sprintf('%s - %s',condition_names{3},'Theta'))
-    
-    subplot(2,3,6);
-    topo=squeeze(nanmedian(nanmean(pow_fix(condition==1,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1))-...
-        squeeze(nanmedian(nanmean(pow_fix(condition==0,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1));
-    topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
-    title(sprintf('%s - %s',condition_names{3},'Alpha'))
-end
+% %%
+% theta_band=[7.5 11];
+% sigma_band=[11 15];
+% for nplot=1:4
+%     figure;
+%     for ncond=1:2
+%         subplot(2,3,3-(ncond));
+%         topo=squeeze(nanmedian(nanmean(pow_fix(condition==ncond-1,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1));
+%         topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
+%         title(sprintf('%s - %s',condition_names{ncond},'Theta'))
+%         
+%         subplot(2,3,6-(ncond));
+%         topo=squeeze(nanmedian(nanmean(pow_fix(condition==ncond-1,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1));
+%         topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
+%         title(sprintf('%s - %s',condition_names{ncond},'Alpha'))
+%     end
+%     subplot(2,3,3);
+%     topo=squeeze(nanmedian(nanmean(pow_fix(condition==1,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1))-...
+%         squeeze(nanmedian(nanmean(pow_fix(condition==0,:,nplot,faxis>theta_band(1) & faxis<theta_band(2)),4),1));
+%     topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
+%     title(sprintf('%s - %s',condition_names{3},'Theta'))
+%     
+%     subplot(2,3,6);
+%     topo=squeeze(nanmedian(nanmean(pow_fix(condition==1,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1))-...
+%         squeeze(nanmedian(nanmean(pow_fix(condition==0,:,nplot,faxis>sigma_band(1) & faxis<sigma_band(2)),4),1));
+%     topoplot(topo', 'cain_elecloc_32ch.locs','style','both','whitebk','on','electrodes','off');
+%     title(sprintf('%s - %s',condition_names{3},'Alpha'))
+% end
 %%
 theta_band=[7.5 10];
 sigma_band=[11 15];
