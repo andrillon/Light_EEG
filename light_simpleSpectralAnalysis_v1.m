@@ -1,29 +1,25 @@
-%% init
+%% initiliase - clear all variables and scripts
 clear all
 close all
 
-% data_path='/Users/tand0009/Data/Cain_Light/';
-data_path='/Volumes/tLab_BackUp1/Monash/Cain_Light/';
+%% set up path for project using local file
+run localdef_ligthEEG.m
 
-path_LSCPtools='/Users/tand0009/WorkGit/LSCPtools/';
-path_fieldtrip='/Users/tand0009/Work/local/fieldtrip/';
-path_eeglab='/Users/tand0009/Work/local/eeglab14_1_2b/';
-
-addpath(genpath(path_LSCPtools));
-addpath(path_fieldtrip);
-ft_defaults;
+addpath(genpath(path_LSCPtools)); % Thomas' general toolkit
+addpath(path_fieldtrip); % Filedtrip toolbox (EEG)
+ft_defaults; % Set up fieldtrip toolbox
 
 %% Parameters Power Extraction
 w_window  = 4; % in seconds
 w_overlap = (w_window/2);
 
-%%
+%% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep '**/*.eeg']);
-nc=0;
 
-%%
+%% Loop across participants to extract power
+nc=0;
 for nS=1:length(List_Subj)
     
     %%% load data
