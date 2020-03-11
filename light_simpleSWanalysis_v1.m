@@ -4,6 +4,7 @@ close all
 
 % data_path='/Users/tand0009/Data/Cain_Light/';
 data_path='/Volumes/tLab_BackUp1/Monash/Cain_Light/';
+save_path='/Users/tand0009/Data/Cain_Light/SWdetection';
 
 path_eeglab='/Users/tand0009/Work/local/eeglab';
 path_LSCPtools='/Users/tand0009/WorkGit/LSCPtools/';
@@ -25,6 +26,7 @@ nc=0;
 
 %%
 for nS=1:length(List_Subj)
+    all_Waves=[];
     
     %%% load data
     File_Name = List_Subj(nS).name;
@@ -72,34 +74,33 @@ for nS=1:length(List_Subj)
     % %     % re-reference to av. mastoids
     % %     data=data-repmat(mean(data([10 21],:),1),[size(data,1), 1]);
     % re-reference to av. mastoids
-           data=data-repmat(mean(data(match_str(hdr.label,{'TP9','TP10'}),:),1),[size(data,1), 1]);
- for nb=1:4
-                this_data=squeeze(data(:,fix_end(nb)+((-4*60*hdr.Fs+1):0))); % select 4 minutes before the end of the FG period
-                this_data=this_data-repmat(mean(this_data,2),1,size(this_data,2));
-                    
-    [twa_results]=twalldetectnew_TA(this_data,hdr.Fs,0);
-                
-    for nE=1:63
-        all_Waves=[all_Waves ; [repmat([n npr nE],length(abs(cell2mat(twa_results.channels(nE).maxnegpkamp))),1) abs(cell2mat(twa_results.channels(nE).maxnegpkamp))'+abs(cell2mat(twa_results.channels(nE).maxpospkamp))' ...
-            cell2mat(twa_results.channels(nE).negzx)' ...
-            cell2mat(twa_results.channels(nE).poszx)' ...
-            cell2mat(twa_results.channels(nE).wvend)' ...
-            cell2mat(twa_results.channels(nE).maxnegpk)' ...
-            cell2mat(twa_results.channels(nE).maxnegpkamp)' ...
-            cell2mat(twa_results.channels(nE).maxpospk)' ...
-            cell2mat(twa_results.channels(nE).maxpospkamp)' ...
-            cell2mat(twa_results.channels(nE).mxdnslp)' ...
-            cell2mat(twa_results.channels(nE).mxupslp)' ...
-            ]];
+    data=data-repmat(mean(data(match_str(hdr.label,{'TP9','TP10'}),:),1),[size(data,1), 1]);
+    for nb=1:5
+        if nb==1
+        this_data=squeeze(data(:,baseline_end+((-4*60*hdr.Fs+1):0))); % select 4 minutes before the end of the FG period
+        else
+        this_data=squeeze(data(:,fix_end(nb-1)+((-4*60*hdr.Fs+1):0))); % select 4 minutes before the end of the FG period
+        end
+        this_data=this_data-repmat(mean(this_data,2),1,size(this_data,2));
+        [twa_results]=twalldetectnew_TA_v2(this_data,hdr.Fs,0);
+        
+        for nE=1:size(this_data,1)
+            all_Waves=[all_Waves ; [repmat([nS nb nE],length(abs(cell2mat(twa_results.channels(nE).maxnegpkamp))),1) abs(cell2mat(twa_results.channels(nE).maxnegpkamp))'+abs(cell2mat(twa_results.channels(nE).maxpospkamp))' ...
+                cell2mat(twa_results.channels(nE).negzx)' ...
+                cell2mat(twa_results.channels(nE).poszx)' ...
+                cell2mat(twa_results.channels(nE).wvend)' ...
+                cell2mat(twa_results.channels(nE).maxnegpk)' ...
+                cell2mat(twa_results.channels(nE).maxnegpkamp)' ...
+                cell2mat(twa_results.channels(nE).maxpospk)' ...
+                cell2mat(twa_results.channels(nE).maxpospkamp)' ...
+                cell2mat(twa_results.channels(nE).mxdnslp)' ...
+                cell2mat(twa_results.channels(nE).mxupslp)' ...
+                cell2mat(twa_results.channels(nE).maxampwn)' ...
+                cell2mat(twa_results.channels(nE).minampwn)' ...
+                ]];
+        end
     end
-   end
-    % loop across electrodes
-    EEG_channels=hdr.label;
-    EEG_channels(match_str(EEG_channels,{'x_dir','y_dir','z_dir','ECG1','ECG2','EOG R','EOG L'}))=[];
-    pick_channels=hdr.label; %find(ismember(hdr.label,EEG_channels));
-    for nelec=1:length(pick_channels)
-    
-    end
+    save([save_path filesep File_Name(1:end-4) '_SW_all'],'all_Waves')
 end
 
 %% figures

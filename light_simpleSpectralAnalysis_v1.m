@@ -7,7 +7,7 @@ data_path='/Volumes/tLab_BackUp1/Monash/Cain_Light/';
 
 path_LSCPtools='/Users/tand0009/WorkGit/LSCPtools/';
 path_fieldtrip='/Users/tand0009/Work/local/fieldtrip/';
-path_eeglab='/Users/tand0009/Work/local/eeglab/';
+path_eeglab='/Users/tand0009/Work/local/eeglab14_1_2b/';
 
 addpath(genpath(path_LSCPtools));
 addpath(path_fieldtrip);
@@ -139,7 +139,7 @@ end
 %%
 theta_band=[7.5 10];
 alpha_band=[10 12];
-% addpath((path_eeglab))
+addpath(genpath(path_eeglab))
 for nplot=2
     figure;
     if nplot==1
