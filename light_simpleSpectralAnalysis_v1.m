@@ -16,6 +16,7 @@ w_overlap = (w_window/2);
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
+data_path='/Users/tand0009/Data/Cain_Light/';
 List_Subj=dir([data_path filesep '**/*.eeg']);
 
 %% Loop across participants to extract power
@@ -24,9 +25,6 @@ for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
-    if strcmp(File_Name,'DLT001.eeg') || strcmp(File_Name,'DLT004.eeg') || strcmp(File_Name,'DLT016.eeg') || strcmp(File_Name,'DLT024.eeg') || strcmp(File_Name,'DLT026.eeg')
-        continue;
-    end
     File_Path = List_Subj(nS).folder;
     nc=nc+1;
     fprintf('... processing %s (%g/%g)\n',File_Name,nS,length(List_Subj))
@@ -35,6 +33,21 @@ for nS=1:length(List_Subj)
     events  = ft_read_event([File_Path filesep File_Name]);
     data    = ft_read_data([File_Path filesep File_Name]);
     
+    if strcmp(File_Name,'DLT001.eeg')
+        continue;
+    elseif strcmp(File_Name,'DLT004.eeg')
+        events([5 6 9])=[];
+    elseif strcmp(File_Name,'DLT016.eeg')
+        events(9).value='CT3';
+        events(10).value='FG4';
+    elseif strcmp(File_Name,'DLT024.eeg')
+        events(3).value='FG1'; events(2)=[];
+    elseif strcmp(File_Name,'DLT026.eeg')
+        events(1)=[];
+        events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
+    end
+    
+   
     if SubInfo.Condition(match_str(SubInfo.PT_Code,File_Name(1:end-4)))=='D'
         condition(nc) = 0;
     elseif SubInfo.Condition(match_str(SubInfo.PT_Code,File_Name(1:end-4)))=='E'
