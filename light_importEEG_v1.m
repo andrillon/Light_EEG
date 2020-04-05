@@ -31,8 +31,15 @@ for nS=1:length(List_Subj)
     
     % clean events
     if strcmp(File_Name,'DLT001.eeg')
-     fprintf('... SKIPPING (to be fixed)\n')
-       continue;
+        events(4).value='Baseline';
+        events(5).value='FG1'; events(5).type='Comment'; events(5).sample=583841;
+        events(6).value='CT1'; events(6).sample=793500;
+        events(7).value='FG2'; events(7).sample=883500;
+        events(8).value='CT2'; events(8).sample=1033500;
+        events(9).value='FG3'; events(9).sample=1123500;
+        events(10).value='CT3'; events(10).sample=1273500;
+        events(11).value='FG4'; events(11).sample=1363500;
+        events(12).value='CT4'; events(12).sample=1513500;
     elseif strcmp(File_Name,'DLT004.eeg')
         events([5 6 9])=[];
     elseif strcmp(File_Name,'DLT016.eeg')
