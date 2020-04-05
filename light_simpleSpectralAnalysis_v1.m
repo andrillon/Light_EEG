@@ -16,7 +16,6 @@ w_overlap = (w_window/2);
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-data_path='/Users/tand0009/Data/Cain_Light/';
 List_Subj=dir([data_path filesep '**/*.eeg']);
 
 %% Loop across participants to extract power

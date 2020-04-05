@@ -12,7 +12,6 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-data_path='/Users/tand0009/Data/Cain_Light/';
 List_Subj=dir([data_path filesep '**/*.eeg']);
 
 %% Loop across participants to extract power
@@ -40,7 +39,7 @@ for nS=1:length(List_Subj)
         events(9).value='CT3';
         events(10).value='FG4';
     elseif strcmp(File_Name,'DLT024.eeg')
-        events(3).value='FG1'; events(2)=[];
+        events(3).value='FG1'; events(2).value='Baseline';
     elseif strcmp(File_Name,'DLT026.eeg')
         events(1)=[];
         events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
@@ -59,12 +58,8 @@ for nS=1:length(List_Subj)
     fprintf('... ... baseline: %g min\n',baseline_duration)
     % find boundaries of FG blocks
     for nb=1:4
-        if strcmp(File_Name,'DLT024.eeg') && nb==1
-            fix_beg(nb) = events_times(find(~(cellfun(@isempty,regexp({events.value},sprintf('FG %g real',nb))))));
-        else
-            fix_beg(nb) = events_times(find(~(cellfun(@isempty,regexp({events.value},sprintf('FG%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('FG %g',nb))))));
-        end
-        fix_end(nb) = events_times(find(~(cellfun(@isempty,regexp({events.value},sprintf('CT%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('CT %g',nb))))));
+        fix_beg(nb) = events_times(find(~(cellfun(@isempty,regexp({events.value},sprintf('FG%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('FG %g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('fg%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('fg %g',nb))))));
+        fix_end(nb) = events_times(find(~(cellfun(@isempty,regexp({events.value},sprintf('CT%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('CT %g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('ct%g',nb)))) | ~(cellfun(@isempty,regexp({events.value},sprintf('ct %g',nb))))));
         fix_duration(nb) = (fix_end(nb)-fix_beg(nb))/hdr.Fs/60;
         fprintf('... ... FG block %g: %g min\n',nb,fix_duration(nb))
     end
