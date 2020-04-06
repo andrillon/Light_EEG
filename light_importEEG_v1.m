@@ -44,8 +44,9 @@ for nS=1:length(List_Subj)
         events(1)=[];
         events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
     elseif strcmp(File_Name,'DLT038.eeg')
-        fprintf('... SKIPPING (baseline too short)\n')
-       continue;
+%         fprintf('... SKIPPING (baseline too short)\n')
+%        continue;
+        events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
     end
     for ne=1:length(events)
         if isempty(events(ne).value)
