@@ -30,7 +30,8 @@ for nS=1:length(List_Subj)
     data    = ft_read_data([File_Path filesep File_Name]);
     
     % clean events
-    if strcmp(File_Name,'DLT001.eeg')
+            events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
+if strcmp(File_Name,'DLT001.eeg')
         events(4).value='Baseline';
         events(5).value='FG1'; events(5).type='Comment'; events(5).sample=583841;
         events(6).value='CT1'; events(6).sample=793500;
@@ -49,11 +50,9 @@ for nS=1:length(List_Subj)
         events(3).value='FG1'; events(2).value='Baseline';
     elseif strcmp(File_Name,'DLT026.eeg')
         events(1)=[];
-        events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
-    elseif strcmp(File_Name,'DLT038.eeg')
+%     elseif strcmp(File_Name,'DLT038.eeg')
 %         fprintf('... SKIPPING (baseline too short)\n')
 %        continue;
-        events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
     end
     for ne=1:length(events)
         if isempty(events(ne).value)
