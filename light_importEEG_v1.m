@@ -50,7 +50,7 @@ if strcmp(File_Name,'DLT001.eeg')
     elseif strcmp(File_Name,'DLT026.eeg')
         events(1)=[];
         events(find(~(cellfun(@isempty,regexp({events.value},'^LostSamples')))))=[];
-    elseif strcmp(File_Name,'dlt038.eeg')
+    elseif strcmp(File_Name,'DLT038.eeg')
         events(3)=[];
     end
     for ne=1:length(events)
