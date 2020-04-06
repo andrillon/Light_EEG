@@ -14,6 +14,8 @@ load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'e_*.mat']);
 
+mkdir([data_path filesep 'fig_badCh']);
+
 %% Loop across participants to extract power
 for nS=1:length(List_Subj)
     
@@ -49,4 +51,10 @@ for nS=1:length(List_Subj)
     imagesc(abs(all_data));
     caxis([0 1]*500);
     colorbar;
+    this_title=File_Name;
+    this_title(findstr(this_title,'_'))=' ';
+    this_title(end-3:end)=[];
+    title(this_title);
+    set(gca,'YTick',1:32);
+    print(gcf, [data_path filesep 'fig_badCh' filesep  File_Name '.png'], '-dpng');
 end
