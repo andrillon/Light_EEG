@@ -55,6 +55,6 @@ for nS=1:length(List_Subj)
     this_title(findstr(this_title,'_'))=' ';
     this_title(end-3:end)=[];
     title(this_title);
-    set(gca,'YTick',1:32);
+    set(gca,'YTick',1:length(data.label),'YTickLabel',data.label);
     print(gcf, [data_path filesep 'fig_badCh' filesep  File_Name '.png'], '-dpng');
 end
