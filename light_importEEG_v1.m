@@ -12,7 +12,7 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep '**/*.eeg']);
+List_Subj=dir([data_path filesep 'e_*.mat']);
 
 %% Loop across participants to extract power
 duration_epoch=[-4.5 0.5]; % in minutes
