@@ -12,7 +12,7 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'e_*.mat']);
+List_Subj=dir([data_path filesep 'e_ft_*.mat']);
 
 mkdir([data_path filesep 'fig_badCh']);
 
