@@ -24,7 +24,7 @@ for nS=1:length(List_Subj)
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
     
-    %%% Re-reference to average
+    %%% Re-reference to average THOMAS ADDS DETREND
     cfg=[];
     cfg.reref      = 'yes';
     cfg.refchannel = 'all';

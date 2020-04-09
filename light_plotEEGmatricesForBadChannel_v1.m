@@ -45,16 +45,16 @@ for nS=1:length(List_Subj)
     %%%
     all_data=[];
     for nb=1:length(data.trial)
-        all_data=[all_data data.trial{nb}];
+        all_data=[all_data data2.trial{nb}];
     end
     figure; format_fig;
     imagesc(abs(all_data));
     caxis([0 1]*500);
     colorbar;
-    this_title=File_Name;
-    this_title(findstr(this_title,'_'))=' ';
-    this_title(end-3:end)=[];
-    title(this_title);
+%     this_title=File_Name;
+%     this_title(findstr(this_title,'_'))=' ';
+%     this_title(end-3:end)=[];
+%     title(this_title);
     set(gca,'YTick',1:length(data.label),'YTickLabel',data.label);
     print(gcf, [data_path filesep 'fig_badCh' filesep  File_Name '.png'], '-dpng');
 end
