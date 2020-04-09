@@ -14,8 +14,6 @@ load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'e_*.mat']);
 
-mkdir([data_path filesep 'fig_badCh']);
-
 %% Loop across participants to extract power
 for nS=1:length(List_Subj)
     
@@ -28,11 +26,27 @@ for nS=1:length(List_Subj)
     cfg=[];
     cfg.reref      = 'yes';
     cfg.refchannel = 'all';
+    
+    cfg.demean        = 'yes';
+    
+    cfg.hpfilter       = 'yes';        % enable high-pass filtering
+    cfg.hpfilttype     = 'but';
+    cfg.hpfiltord         = 4;
+    cfg.hpfreq         = 0.1;
+    
+    cfg.lpfilter       = 'yes';        % enable high-pass filtering
+    cfg.lpfilttype     = 'but';
+    cfg.lpfiltord         = 4;
+    cfg.lpfreq         = 40;
+
+    cfg.dftfilter      = 'yes';        % enable notch filtering to eliminate power line noise
+    cfg.dftfreq        = [50]; % set up the frequencies for notch filtering
+    
     data = ft_preprocessing(cfg,data);
     
     %%% run ICA
     cfg        = [];
     cfg.method = 'runica'; % this is the default and uses the implementation from EEGLAB
     comp = ft_componentanalysis(cfg, data);
-    save([data_path filesep 'I' File_Name],'data','comp');
+    save([data_path filesep 'If' File_Name],'data','comp');
 end
