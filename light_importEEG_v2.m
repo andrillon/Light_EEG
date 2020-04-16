@@ -43,23 +43,13 @@ for nS=1:length(List_Subj)
     
     %%% Re-reference and high-pass filter
     cfg.reref      = 'yes';
-    if isempty(match_str(hdr.label,'Tp10'))
-        cfg.refchannel = {'TP9','TP10'};
-    else
-        cfg.refchannel = {'TP9','Tp10'};
-    end
-    %     cfg.hpfilter       = 'yes';        % enable high-pass filtering
-    %     cfg.hpfilttype     = 'but';
-    %     cfg.hpfiltord         = 4;
-    %     cfg.hpfreq         = 0.1;
-    
-    %%% Save the data
-    if isempty(match_str(hdr.label,'Tp10'))
-        cfg.channel = {'Fp1','Fz','F3','F7','FT9','FC5','FC1','C3','T7','TP9','CP5','CP1','Pz','P3','P7','O1','Oz','O2','P4','P8','TP10','CP6','CP2','Cz','C4','T8','FT10','FC6','FC2','F4','F8','Fp2'};
-    else
-        cfg.channel = {'Fp1','Fz','F3','F7','FT9','FC5','FC1','C3','T7','TP9','CP5','CP1','Pz','P3','P7','O1','Oz','O2','P4','P8','Tp10','CP6','CP2','Cz','C4','T8','FT10','FC6','FC2','F4','F8','Fp2'};
-    end
+    cfg.channel = {'Fp1','Fz','F3','F7','FT9','FC5','FC1','C3','T7','TP9','CP5','CP1','Pz','P3','P7','O1','Oz','O2','P4','P8','TP10','CP6','CP2','Cz','C4','T8','FT10','FC6','FC2','F4','F8','Fp2'};
+    cfg.refchannel = {'TP9','TP10'};
+
+  
     data = ft_preprocessing(cfg);
     data.label(match_str(hdr.label,'Tp10'))={'TP10'};
     save([data_path filesep 'e_ft_' File_Name(1:end-4)],'data','cfg');
 end
+
+
