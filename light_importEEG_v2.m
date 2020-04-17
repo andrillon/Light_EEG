@@ -26,10 +26,9 @@ for nS=1:length(List_Subj)
     fprintf('... processing %s (%g/%g)\n',File_Name,nS,length(List_Subj))
     hdr=ft_read_header([File_Path filesep File_Name]);
     
-    %%% Load Raw data
-    cfg                    = [];
-    cfg.dataset            = [File_Path filesep File_Name];
-    raw_data                   = ft_preprocessing(cfg); % read raw data
+%     %%% Load Raw data
+%     cfg                    = [];
+%     cfg.dataset            = [File_Path filesep File_Name];
     
     %%% Define epochs
     cfg=[];
@@ -40,14 +39,16 @@ for nS=1:length(List_Subj)
     cfg.trialdef.prestim    = 4.5*60;
     cfg.trialdef.poststim   = 0.5*60;
     cfg = ft_definetrial(cfg);
-    
+    data                   = ft_preprocessing(cfg); % read raw data
+
     %%% Re-reference and high-pass filter
+    cfg=[];
     cfg.reref      = 'yes';
     cfg.channel = {'Fp1','Fz','F3','F7','FT9','FC5','FC1','C3','T7','TP9','CP5','CP1','Pz','P3','P7','O1','Oz','O2','P4','P8','TP10','CP6','CP2','Cz','C4','T8','FT10','FC6','FC2','F4','F8','Fp2'};
     cfg.refchannel = {'TP9','TP10'};
-    raw_data.label(1:32)=cfg.channel;
+    data.label(1:32)=cfg.channel;
   
-    data = ft_preprocessing(cfg,raw_data);
+    data = ft_preprocessing(cfg,data);
 %     data.label(match_str(hdr.label,'Tp10'))={'TP10'};
     save([data_path filesep 'e_ft_' File_Name(1:end-4)],'data','cfg');
 end
