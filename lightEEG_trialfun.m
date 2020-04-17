@@ -32,6 +32,10 @@ elseif strcmpi(File_Name,'DLT004')
 elseif strcmpi(File_Name,'DLT016')
     event(9).value='CT3';
     event(10).value='FG4';
+elseif strcmpi(File_Name,'DLT018')
+    event(2).value='Baseline';
+    event(3).value='FG1';
+    event(6).value='CT2';
 elseif strcmpi(File_Name,'DLT024')
     event(3).value='FG1'; event(2).value='Baseline';
 elseif strcmpi(File_Name,'DLT026')
