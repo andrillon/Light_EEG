@@ -29,7 +29,7 @@ for nS=1:length(List_Subj)
     %%% Load Raw data
     cfg                    = [];
     cfg.dataset            = [File_Path filesep File_Name];
-    data                   = ft_preprocessing(cfg); % read raw data
+    raw_data                   = ft_preprocessing(cfg); % read raw data
     
     %%% Define epochs
     cfg=[];
@@ -45,10 +45,10 @@ for nS=1:length(List_Subj)
     cfg.reref      = 'yes';
     cfg.channel = {'Fp1','Fz','F3','F7','FT9','FC5','FC1','C3','T7','TP9','CP5','CP1','Pz','P3','P7','O1','Oz','O2','P4','P8','TP10','CP6','CP2','Cz','C4','T8','FT10','FC6','FC2','F4','F8','Fp2'};
     cfg.refchannel = {'TP9','TP10'};
-
+    raw_data.label(1:32)=cfg.channel;
   
-    data = ft_preprocessing(cfg);
-    data.label(match_str(hdr.label,'Tp10'))={'TP10'};
+    data = ft_preprocessing(cfg,raw_data);
+%     data.label(match_str(hdr.label,'Tp10'))={'TP10'};
     save([data_path filesep 'e_ft_' File_Name(1:end-4)],'data','cfg');
 end
 
