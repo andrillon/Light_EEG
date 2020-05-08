@@ -28,4 +28,11 @@ for nS=1:length(List_Subj)
     
     set(gcf, 'Position', get(0, 'Screensize'));
     print(gcf, [data_path filesep 'fig_Comp2' filesep  File_Name '.png'], '-dpng');
+    
+    cfg = [];
+    cfg.layout = 'cain_elecloc_32ch_layout.mat'; % specify the layout file that should be used for plotting
+    cfg.viewmode = 'component';
+    ft_databrowser(cfg, comp)
+    
+    savefig([data_path filesep 'fig_Comp2' filesep  File_Name '.fig'])
 end
