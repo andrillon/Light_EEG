@@ -12,7 +12,7 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'TFe_*.mat']);
+List_Subj=dir([data_path filesep 'TFCIfIfe_*.mat']);
 
 %% Loop across participants to extract power
 for nS=1:length(List_Subj)
@@ -55,7 +55,7 @@ Colors={[100,100,100
 
 thisChLabel='Cz';
 freqs=TFRhann.freq;
-    
+
 figure;
 for nCond=1:2
     subplot(1,2,nCond)
@@ -71,4 +71,32 @@ for nCond=1:2
     legend(hp,{'B0','B1','B2','B3','B4'});
     title(sprintf('%s - %s',Conds{nCond},thisChLabel));
     ylim([-4 6])
+end
+
+%%
+FOI=[9 11]; % Freq Band of Interest
+figure; set(gcf,'Position',[64          33        1097         952]);
+for nCond=1:2
+    for nB=1:5
+        subplot(3,5,5*(nCond-1)+nB);
+        Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{nCond},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
+        
+        simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
+        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
+        colorbar;
+        caxis([-1 1]*1.5);
+        format_fig;
+    end
+end
+
+for nB=1:5
+    subplot(3,5,10+nB);
+    Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{1},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1))-...
+        squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{2},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
+    
+    simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
+    title(sprintf('%s - %s','E vs D',thisChLabel));
+    colorbar;
+    caxis([-1 1]*0.3);
+    format_fig;
 end
