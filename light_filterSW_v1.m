@@ -36,13 +36,13 @@ for nS=1:length(List_Subj)
     fprintf('... condition %s\n',CondSubj(nS))
     
     %%% parameters of SW detection
-    paramSW.prticle_Thr=90; % 80 or 90 or 95
-    paramSW.LimFrqW=[1 4]; % [1 4] or [4 10]
-    paramSW.AmpCriterionIdx=4; % 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
-    paramSW.fixThr=[];
-    paramSW.art_ampl=150;
-    paramSW.max_posampl=75;
-    paramSW.max_Freq=7;
+    paramSW.fixThr=[]; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
+    paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
+    paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
+    paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
+    paramSW.art_ampl=150; % Rejection criterion
+    paramSW.max_posampl=75; % Rejection criterion
+    paramSW.max_Freq=7; % Rejection criterion
     
     %%% clean SW detection
     all_Waves=double(all_Waves);

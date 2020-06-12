@@ -15,6 +15,8 @@ load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'TFCIfIfe_*.mat']);
 
 %% Loop across participants to extract power
+tlCondE=[];
+tlCondD=[];
 for nS=1:length(List_Subj)
     
     %%% load data
@@ -38,6 +40,33 @@ for nS=1:length(List_Subj)
     CondSubj(nS)=SubInfo.Condition(find(~cellfun(@isempty,regexpi(SubInfo.PT_Code,CodeSubj))));
     fprintf('... condition %s\n',CondSubj(nS))
     
+    if CondSubj(nS)=='E'
+        if isempty(tlCondE)
+            tlCondE=TFRhann;
+            tlCondE.dimord='subj_chan_freq';
+            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+            tlCondE.powspctrm=[];
+            tlCondE.powspctrm(1,:,:)=mean(temp,1);
+            nc1=1;
+        else
+            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+            nc1=nc1+1;
+            tlCondE.powspctrm(nc1,:,:)=mean(temp,1);
+        end
+    elseif CondSubj(nS)=='D'
+        if isempty(tlCondD)
+            tlCondD=TFRhann;
+            tlCondD.dimord='subj_chan_freq';
+            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+            tlCondD.powspctrm=[];
+            tlCondD.powspctrm(1,:,:)=mean(temp,1);
+            nc2=1;
+        else
+            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+            nc2=nc2+1;
+            tlCondD.powspctrm(nc2,:,:)=mean(temp,1);
+        end
+    end
 end
 
 %%
@@ -53,7 +82,7 @@ Colors={[100,100,100
     240,59,32
     189,0,38]/256};
 
-thisChLabel='Cz';
+thisChLabel='Pz';
 freqs=TFRhann.freq;
 
 figure;
@@ -74,8 +103,6 @@ for nCond=1:2
 end
 
 
-%%
-thisChLabel='Pz';
 figure;
 for nCond=1:2
     hold on;
@@ -87,13 +114,13 @@ for nCond=1:2
     format_fig;
     xlabel('Freq (Hz)');
     ylabel('log(Power)');
-%     legend(hp,{'B0','B1','B2','B3','B4'});
+    %     legend(hp,{'B0','B1','B2','B3','B4'});
     title(sprintf('%s - %s',Conds{nCond},thisChLabel));
     ylim([-4 2])
-   xlim([1 30])
+    xlim([1 30])
 end
 %%
-FOI=[6 11]; % Freq Band of Interest
+FOI=[15 25]; % Freq Band of Interest
 figure; set(gcf,'Position',[64          33        1097         952]);
 for nCond=1:2
     for nB=1:5
@@ -103,7 +130,7 @@ for nCond=1:2
         simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
         title(sprintf('%s - %s',Conds{nCond},thisChLabel));
         colorbar;
-        caxis([-2 0]);
+        %         caxis([-2 0]);
         format_fig;
     end
 end
@@ -116,6 +143,35 @@ for nB=1:5
     simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
     title(sprintf('%s - %s','E vs D',thisChLabel));
     colorbar;
-    caxis([-1 1]*1);
+    %     caxis([-1 1]*0.3);
     format_fig;
 end
+
+%%
+cfg = [];
+cfg.channel          = 'all';
+cfg.frequency        = 'all';
+cfg.method           = 'montecarlo';
+cfg.statistic        = 'ft_statfun_indepsamplesT';
+cfg.correctm         = 'cluster';
+cfg.clusteralpha     = 0.05;
+cfg.clusterstatistic = 'maxsum';
+cfg.minnbchan        = 2;
+cfg.tail             = 0;
+cfg.clustertail      = 0;
+cfg.alpha            = 0.025;
+cfg.numrandomization = 100;
+% prepare_neighbours determines what sensors may form clusters
+cfg_neighb.method    = 'distance';
+cfg_neighb.layout=layout;
+cfg.neighbours       = ft_prepare_neighbours(cfg_neighb, TFRhann);
+
+design = zeros(1,size(tlCondE.powspctrm,1) + size(tlCondD.powspctrm,1));
+design(1,1:size(tlCondE.powspctrm,1)) = 1;
+design(1,(size(tlCondE.powspctrm,1)+1):(size(tlCondE.powspctrm,1)+...
+    size(tlCondD.powspctrm,1))) = 2;
+
+cfg.design           = design;
+cfg.ivar             = 1;
+
+[stat] = ft_freqstatistics(cfg, tlCondE, tlCondD);

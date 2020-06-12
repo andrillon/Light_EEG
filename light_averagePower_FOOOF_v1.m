@@ -96,12 +96,16 @@ table_bg.Elec=removecats(table_bg.Elec);
 
 mdl_0=fitlme(table_bg,'Slope~1+BlockN+(1|SubID)');
 mdl_1=fitlme(table_bg,'Slope~1+BlockN+Elec+(1|SubID)');
-mdl_2=fitlme(table_bg,'Slope~1+BlockN+Elec+Cond+(1|SubID)');
+mdl_2=fitlme(table_bg,'Slope~1+BlockN+Cond+(1|SubID)');
+mdl_3=fitlme(table_bg,'Slope~1+BlockN*Cond+(1|SubID)');
+% compare(mdl_0,mdl_2);
 
 
 mdl_0b=fitlme(table_bg,'Offset~1+BlockN+(1|SubID)');
 mdl_1b=fitlme(table_bg,'Offset~1+BlockN+Elec+(1|SubID)');
-mdl_2b=fitlme(table_bg,'Offset~1+BlockN+Elec+Cond+(1|SubID)');
+mdl_2b=fitlme(table_bg,'Offset~1+BlockN+Cond+(1|SubID)');
+mdl_3b=fitlme(table_bg,'Offset~1+BlockN*Cond+(1|SubID)');
+% compare(mdl_0b,mdl_2b)
 
 
 table_alpha=array2table(av_fooof_alpha,'VariableNames',{'SubID','BlockN','ElecN','CondF','Freq','Amp','BW'});
@@ -122,14 +126,15 @@ table_alpha.Elec=removecats(table_alpha.Elec);
 mdla_0=fitlme(table_alpha,'Freq~1+(1|SubID)');
 mdla_1=fitlme(table_alpha,'Freq~1+Elec+(1|SubID)');
 mdla_2=fitlme(table_alpha,'Freq~1+BlockN+Elec+(1|SubID)');
-mdla_3=fitlme(table_alpha,'Freq~1+BlockN+Elec+Cond+(1|SubID)');
+mdla_3=fitlme(table_alpha,'Freq~1+BlockN+Cond+(1|SubID)');
+mdla_4=fitlme(table_alpha,'Freq~1+BlockN*Cond+(1|SubID)');
 
 
 mdlb_0=fitlme(table_alpha,'Amp~1+(1|SubID)');
 mdlb_1=fitlme(table_alpha,'Amp~1+Elec+(1|SubID)');
 mdlb_2=fitlme(table_alpha,'Amp~1+BlockN+Elec+(1|SubID)');
-mdlb_3=fitlme(table_alpha,'Amp~1+BlockN+Elec+Cond+(1|SubID)');
-mdlb_4=fitlme(table_alpha,'Amp~1+BlockN*Cond+Elec+(1|SubID)');
+mdlb_3=fitlme(table_alpha,'Amp~1+BlockN+Cond+(1|SubID)');
+mdlb_4=fitlme(table_alpha,'Amp~1+BlockN*Cond+(1|SubID)');
 %%
 FOI=[9 11]; % Freq Band of Interest
 figure; set(gcf,'Position',[64          33        1097         952]);
