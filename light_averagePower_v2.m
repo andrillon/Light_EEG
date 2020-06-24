@@ -17,6 +17,8 @@ List_Subj=dir([data_path filesep 'TFCIfIfe_*.mat']);
 %% Loop across participants to extract power
 tlCondE=[];
 tlCondD=[];
+design=cell(1,2);
+TFRhann_all=[];
 for nS=1:length(List_Subj)
     
     %%% load data
@@ -40,31 +42,40 @@ for nS=1:length(List_Subj)
     CondSubj(nS)=SubInfo.Condition(find(~cellfun(@isempty,regexpi(SubInfo.PT_Code,CodeSubj))));
     fprintf('... condition %s\n',CondSubj(nS))
     
+%     TFRhann_all{nS}=TFRhann;
+%     TFRhann_all{nS}.powspctrm=squeeze(mean(TFRhann.powspctrm(2:5,:,:,:),1));
+%     TFRhann_all{nS}.dimord='chan_freq_time';
+%     
+    if CondSubj(nS)=='E'
+        design{1}=[design{1} [ones(1,4) ; 1:4]];
+    elseif CondSubj(nS)=='D'
+        design{2}=[design{2} [2*ones(1,4) ; 1:4]];
+    end
     if CondSubj(nS)=='E'
         if isempty(tlCondE)
             tlCondE=TFRhann;
             tlCondE.dimord='subj_chan_freq';
-            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+%             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             tlCondE.powspctrm=[];
-            tlCondE.powspctrm(1,:,:)=mean(temp,1);
+            tlCondE.powspctrm=squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4));
             nc1=1;
         else
-            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+%             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             nc1=nc1+1;
-            tlCondE.powspctrm(nc1,:,:)=mean(temp,1);
+            tlCondE.powspctrm=cat(1,tlCondE.powspctrm,squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4)));
         end
     elseif CondSubj(nS)=='D'
         if isempty(tlCondD)
             tlCondD=TFRhann;
             tlCondD.dimord='subj_chan_freq';
-            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+%             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             tlCondD.powspctrm=[];
-            tlCondD.powspctrm(1,:,:)=mean(temp,1);
+            tlCondD.powspctrm=squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4));
             nc2=1;
         else
-            temp=log(squeeze(mean(TFRhann.powspctrm,4)));
+%             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             nc2=nc2+1;
-            tlCondD.powspctrm(nc2,:,:)=mean(temp,1);
+            tlCondD.powspctrm=cat(1,tlCondD.powspctrm,squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4)));
         end
     end
 end
@@ -81,97 +92,63 @@ Colors={[100,100,100
     253,141,60
     240,59,32
     189,0,38]/256};
+tlCondE=rmfield(tlCondE,'time');
+tlCondD=rmfield(tlCondD,'time');
 
-thisChLabel='Pz';
-freqs=TFRhann.freq;
-
-figure;
-for nCond=1:2
-    subplot(1,2,nCond)
-    hold on;
-    hp=[];
-    for nBl=1:5
-        temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
-        [~,hp(nBl)]=simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,[],2);
-    end
-    format_fig;
-    xlabel('Freq (Hz)');
-    ylabel('log(Power)');
-    legend(hp,{'B0','B1','B2','B3','B4'});
-    title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-    ylim([-4 6])
-end
-
-
-figure;
-for nCond=1:2
-    hold on;
-    hp=[];
-    for nBl=1:5
-        temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
-        simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
-    end
-    format_fig;
-    xlabel('Freq (Hz)');
-    ylabel('log(Power)');
-    %     legend(hp,{'B0','B1','B2','B3','B4'});
-    title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-    ylim([-4 2])
-    xlim([1 30])
-end
-%%
-FOI=[15 25]; % Freq Band of Interest
-figure; set(gcf,'Position',[64          33        1097         952]);
-for nCond=1:2
-    for nB=1:5
-        subplot(3,5,5*(nCond-1)+nB);
-        Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{nCond},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
-        
-        simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-        colorbar;
-        %         caxis([-2 0]);
-        format_fig;
-    end
-end
-
-for nB=1:5
-    subplot(3,5,10+nB);
-    Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{1},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1))-...
-        squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{2},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
-    
-    simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-    title(sprintf('%s - %s','E vs D',thisChLabel));
-    colorbar;
-    %     caxis([-1 1]*0.3);
-    format_fig;
-end
 
 %%
 cfg = [];
 cfg.channel          = 'all';
 cfg.frequency        = 'all';
 cfg.method           = 'montecarlo';
-cfg.statistic        = 'ft_statfun_indepsamplesT';
+cfg.statistic        = 'indepsamplesT';
 cfg.correctm         = 'cluster';
 cfg.clusteralpha     = 0.05;
 cfg.clusterstatistic = 'maxsum';
-cfg.minnbchan        = 2;
+% cfg.resampling='bootstrap';
+cfg.minnbchan        = 1;
 cfg.tail             = 0;
 cfg.clustertail      = 0;
-cfg.alpha            = 0.025;
-cfg.numrandomization = 100;
+cfg.alpha            = 0.05;
+cfg.numrandomization = 	500;
 % prepare_neighbours determines what sensors may form clusters
-cfg_neighb.method    = 'distance';
-cfg_neighb.layout=layout;
+cfglay=[];
+cfglay.layout=layout;
+layout = ft_prepare_layout(cfglay);
+cfg_neighb=[];
+cfg_neighb.method    = 'triangulation';
+cfg_neighb.layout=cfglay.layout;
 cfg.neighbours       = ft_prepare_neighbours(cfg_neighb, TFRhann);
 
-design = zeros(1,size(tlCondE.powspctrm,1) + size(tlCondD.powspctrm,1));
-design(1,1:size(tlCondE.powspctrm,1)) = 1;
-design(1,(size(tlCondE.powspctrm,1)+1):(size(tlCondE.powspctrm,1)+...
-    size(tlCondD.powspctrm,1))) = 2;
-
-cfg.design           = design;
+cfg.design           = [design{1}(1,:) design{2}(1,:)];%[ones(1,size(tlCondE.powspctrm,1)) 2*ones(1,size(tlCondD.powspctrm,1))];
 cfg.ivar             = 1;
 
-[stat] = ft_freqstatistics(cfg, tlCondE, tlCondD);
+% [stat] = ft_freqstatistics(cfg, TFRhann_all{1}, TFRhann_all{2}, TFRhann_all{3}, TFRhann_all{4}, TFRhann_all{5}, TFRhann_all{6}, TFRhann_all{7}, TFRhann_all{8}, TFRhann_all{9}, TFRhann_all{10},...
+%      TFRhann_all{11}, TFRhann_all{12}, TFRhann_all{13}, TFRhann_all{14}, TFRhann_all{15}, TFRhann_all{16}, TFRhann_all{17}, TFRhann_all{18}, TFRhann_all{19}, TFRhann_all{20},...
+%      TFRhann_all{21}, TFRhann_all{22}, TFRhann_all{23}, TFRhann_all{24}, TFRhann_all{25}, TFRhann_all{26}, TFRhann_all{27}, TFRhann_all{28}, TFRhann_all{29}, TFRhann_all{30},...
+%      TFRhann_all{31}, TFRhann_all{32}, TFRhann_all{33}, TFRhann_all{34}, TFRhann_all{35}, TFRhann_all{36}, TFRhann_all{37}, TFRhann_all{38}, TFRhann_all{39});
+tlCondD2=tlCondD;
+tlCondE2=tlCondE;
+% tlCondD2.powspctrm(:,[2 3 30 24 7 29 1 32],50:55)=tlCondD2.powspctrm(:,[2 3 30 24 7 29 1 32],50:55)+50;
+tlCondD2.powspctrm(:,[2 3],50:55)=tlCondD2.powspctrm(:,[2 3],50:55)+50;
+% tlCondE2.powspctrm=permute(tlCondE2.powspctrm,[1 3 2]);
+% tlCondD2.powspctrm=permute(tlCondD2.powspctrm,[1 3 2]);
+% tlCondD2.dimord='subj_freq_chan';
+% tlCondE2.dimord='subj_freq_chan';
+
+[stat] = ft_freqstatistics(cfg, tlCondE,tlCondD);
+%%
+cfg = [];
+% tlCondE=rmfield(tlCondE,'time');
+% tlCondD=rmfield(tlCondD,'time');
+freqE_cmb = ft_freqdescriptives(cfg, tlCondE);
+freqD_cmb  = ft_freqdescriptives(cfg, tlCondD);
+
+
+stat.raweffect = freqD_cmb.powspctrm - freqE_cmb.powspctrm;
+cfg = [];
+cfg.alpha  = 0.1;
+cfg.parameter = 'raweffect';
+% cfg.zlim   = [-1e-27 1e-27];
+cfg.layout = layout;
+ft_clusterplot(cfg, stat);
