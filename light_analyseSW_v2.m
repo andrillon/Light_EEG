@@ -14,7 +14,7 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_fix50uV_CIfIfe_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
@@ -99,8 +99,8 @@ data=[];
 for nBl = 1:5
     for nC = 1:2
         data{nBl, nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-         meandata(nBl, nC) =mean(data{nBl, nC}-data{1, nC});
-         semdata(nBl, nC) =sem(data{nBl, nC}-data{1, nC});
+         meandata(nBl, nC) =mean(data{nBl, nC}); %-data{1, nC});
+         semdata(nBl, nC) =sem(data{nBl, nC}); %-data{1, nC});
          
     end
 end
@@ -143,15 +143,15 @@ for nC=1:2
         subplot(2,4,4*(nC-1)+(nBl-1));
         Dens_AVG=[];
         for nEl=1:32
-        Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl)))-...
-             (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
+        Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl))));%-...
+%              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
         end
         
         simpleTopoPlot_ft(Dens_AVG, layout,'on',[],0,1);
-        title(sprintf('%s - %g',Conds{nC},nBl));
+        title(sprintf('%s - %g',Cond{nC},nBl));
         colormap(cmap);
         colorbar;
-        caxis([-1 0]*3);
+        caxis([0 1]*3);
         format_fig;
     end
 end
@@ -160,7 +160,7 @@ end
 cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
 
 figure; set(gcf,'Position',[64          33        1097         450]);
-Conds={'D','E'};
+Cond={'D','E'};
 for nBl=1:5
     subplot(1,5,nBl);
     Dens_AVG=squeeze(mean(SW_density(SW_density(:, 3) == 1 & SW_density(:, 2) == nBl,4:end),1))-...

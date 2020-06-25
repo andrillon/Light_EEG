@@ -41,17 +41,18 @@ for nS=1:length(List_Subj)
 end
 
 %%
-Conds={'E','D'};
-Colors={[100,100,100
-    127,205,187
-    65,182,196
-    44,127,184
-    37,52,148]/256,...
+Conds={'D','E'};
+Colors={
     [100,100,100
     254,178,76
     253,141,60
     240,59,32
-    189,0,38]/256};
+    189,0,38]/256,...
+    [100,100,100
+    127,205,187
+    65,182,196
+    44,127,184
+    37,52,148]/256};
 
 thisChLabel='Cz';
 freqs=TFRhann.freq;
@@ -82,7 +83,11 @@ for nCond=1:2
     hp=[];
     for nBl=1:5
         temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
-        simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+if nCond==1 && nBl==1
+            simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
+else
+    simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+end
     end
     format_fig;
     xlabel('Freq (Hz)');
