@@ -49,17 +49,17 @@ for nS=1:length(List_Subj)
         
         SW_density=[SW_density ; [nS nBl CondSubj(nS)=='E' nout]];
         for nE=1:32
-            SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE) mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1)]];
+            SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE)/4 mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1)]];
         end
-                    SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1) mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
+                    SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1)/4/32 mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
 
    end
     
 end
 
 %%
-table_SW=array2table(SW_properties,'VariableNames',{'SubID','BlockN','Cond','Elec','NumW','P2P','NegP','PosP','negS','posS'});
-table_SWall=array2table(SW_properties_all,'VariableNames',{'SubID','BlockN','Cond','Elec','NumW','P2P','NegP','PosP','negS','posS'});
+table_SW=array2table(SW_properties,'VariableNames',{'SubID','BlockN','Cond','Elec','DensW','P2P','NegP','PosP','negS','posS'});
+table_SWall=array2table(SW_properties_all,'VariableNames',{'SubID','BlockN','Cond','Elec','DensW','P2P','NegP','PosP','negS','posS'});
 
 table_SW.SubID=categorical(table_SW.SubID);
 table_SW.Cond=categorical(table_SW.Cond);
@@ -75,8 +75,8 @@ table_SWall.Cond(table_SWall.Cond=='1')='E';
 table_SWall.Cond(table_SWall.Cond=='0')='D';
 table_SWall.Cond=removecats(table_SWall.Cond);
 
-NumW_mdl0=fitlme(table_SW,'NumW~1+BlockN+(1|SubID)');
-NumW_mdl1=fitlme(table_SW,'NumW~1+BlockN*Cond+(1|SubID)');
+DensW_mdl0=fitlme(table_SW,'DensW~1+BlockN+(1|SubID)');
+DensW_mdl1=fitlme(table_SW,'DensW~1+BlockN*Cond+(1|SubID)');
 
 P2P_mdl0=fitlme(table_SW,'P2P~1+BlockN+(1|SubID)');
 P2P_mdl1=fitlme(table_SW,'P2P~1+BlockN*Cond+(1|SubID)');
@@ -98,9 +98,9 @@ Cond={'D','E'};
 data=[];
 for nBl = 1:5
     for nC = 1:2
-        data{nBl, nC} = (table_SWall.NumW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-         meandata(nBl, nC) =mean(data{nBl, nC}./data{1, nC});
-         semdata(nBl, nC) =sem(data{nBl, nC}./data{1, nC});
+        data{nBl, nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
+         meandata(nBl, nC) =mean(data{nBl, nC}-data{1, nC});
+         semdata(nBl, nC) =sem(data{nBl, nC}-data{1, nC});
          
     end
 end
@@ -113,7 +113,7 @@ scatter((1:5)+0.05,meandata(:,2),'Marker','o','SizeData',144,'MarkerEdgeColor',C
 legend(hb,{'D','E'})
 format_fig;
 xlabel('Block')
-ylabel('Num SW (norm)')
+ylabel('SW/min/elec (norm)')
 % % make figure
 % figure;
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
@@ -137,17 +137,21 @@ ylabel('Num SW (norm)')
 cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
 
 figure; set(gcf,'Position',[64          33        1097         952]);
-Conds={'D','E'};
+Cond={'D','E'};
 for nC=1:2
-    for nBl=1:5
-        subplot(2,5,5*(nC-1)+nBl);
-        Dens_AVG=squeeze(mean(SW_density(SW_density(:, 3) == nC-1 & SW_density(:, 2) == nBl,4:end),1));
+    for nBl=2:5
+        subplot(2,4,4*(nC-1)+(nBl-1));
+        Dens_AVG=[];
+        for nEl=1:32
+        Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl)))-...
+             (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
+        end
         
-        simpleTopoPlot_ft(Dens_AVG', layout,'on',[],0,1);
+        simpleTopoPlot_ft(Dens_AVG, layout,'on',[],0,1);
         title(sprintf('%s - %g',Conds{nC},nBl));
         colormap(cmap);
         colorbar;
-        caxis([0 1]*6);
+        caxis([-1 0]*3);
         format_fig;
     end
 end
