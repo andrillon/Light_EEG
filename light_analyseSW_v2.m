@@ -92,6 +92,9 @@ P2P_mdl1=fitlme(table_SW,'P2P~1+BlockN*Cond+(1|SubID)');
 % 
 % posS_mdl0=fitlme(table_SW,'posS~1+BlockN+(1|SubID)');
 % posS_mdl1=fitlme(table_SW,'posS~1+BlockN*Cond+(1|SubID)');
+
+%% overall topo in both groups
+
 %%
 figure;
 Cond={'D','E'};

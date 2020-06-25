@@ -28,7 +28,7 @@ for nS=1:length(List_Subj)
     if nS==1
         av_logPower=nan([length(List_Subj) size(TFRhann.powspctrm,1) size(TFRhann.powspctrm,2) size(TFRhann.powspctrm,3)]);
     end
-    av_logPower(nS,:,:,:)=log(squeeze(mean(TFRhann.powspctrm,4)));
+    av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm),4)));
     %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
     
     %%% extract info
@@ -84,9 +84,9 @@ for nCond=1:2
     for nBl=1:5
         temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
 if nCond==1 && nBl==1
-            simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
+            simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
 else
-    simpleTplot(freqs,temp_pow,0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+    simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
 end
     end
     format_fig;
@@ -94,7 +94,7 @@ end
     ylabel('log(Power)');
 %     legend(hp,{'B0','B1','B2','B3','B4'});
     title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-    ylim([-4 2])
+    ylim([-5.5 0])
    xlim([1 30])
 end
 %%

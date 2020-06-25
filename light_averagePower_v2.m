@@ -32,7 +32,7 @@ for nS=1:length(List_Subj)
     if nS==1
         av_logPower=nan([length(List_Subj) size(TFRhann.powspctrm,1) size(TFRhann.powspctrm,2) size(TFRhann.powspctrm,3)]);
     end
-    av_logPower(nS,:,:,:)=log(squeeze(mean(TFRhann.powspctrm,4)));
+    av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm),4)));
     %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
     
     %%% extract info
@@ -57,12 +57,12 @@ for nS=1:length(List_Subj)
             tlCondE.dimord='subj_chan_freq';
 %             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             tlCondE.powspctrm=[];
-            tlCondE.powspctrm=squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4));
+            tlCondE.powspctrm=squeeze(log(mean(TFRhann.powspctrm(2:5,:,:,:),4)));
             nc1=1;
         else
 %             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             nc1=nc1+1;
-            tlCondE.powspctrm=cat(1,tlCondE.powspctrm,squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4)));
+            tlCondE.powspctrm=cat(1,tlCondE.powspctrm,squeeze(log(mean(TFRhann.powspctrm(2:5,:,:,:),4))));
         end
     elseif CondSubj(nS)=='D'
         if isempty(tlCondD)
@@ -70,12 +70,12 @@ for nS=1:length(List_Subj)
             tlCondD.dimord='subj_chan_freq';
 %             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             tlCondD.powspctrm=[];
-            tlCondD.powspctrm=squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4));
+            tlCondD.powspctrm=squeeze(log(mean(TFRhann.powspctrm(2:5,:,:,:),4)));
             nc2=1;
         else
 %             temp=log(squeeze(mean(TFRhann.powspctrm,4)));
             nc2=nc2+1;
-            tlCondD.powspctrm=cat(1,tlCondD.powspctrm,squeeze(mean(log(TFRhann.powspctrm(2:5,:,:,:)),4)));
+            tlCondD.powspctrm=cat(1,tlCondD.powspctrm,squeeze(log(mean(TFRhann.powspctrm(2:5,:,:,:),4))));
         end
     end
 end

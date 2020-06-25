@@ -47,6 +47,7 @@ for nS=1:length(List_Subj)
     temp_pow=squeeze(mean(TFRhann.powspctrm,4));
     for nB=1:5
         for nE=1:32
+            try
             fooof_results = fooof(TFRhann.freq, squeeze(temp_pow(nB,nE,:))', f_range, settings,0);
 %             if nE==17
 %                 figure;
@@ -59,6 +60,9 @@ for nS=1:length(List_Subj)
                 av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' fooof_results.peak_params(index,:)]];
             else
                 av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+            end
+            catch
+               continue; 
             end
         end
     end
