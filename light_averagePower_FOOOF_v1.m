@@ -20,7 +20,7 @@ settings = struct();  % Use defaults
 av_fooof_bg=[];
 av_fooof_alpha=[];
 %% Loop across participants to extract power
-for nS=1:length(List_Subj)
+for nS=35 %1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
@@ -69,17 +69,18 @@ for nS=1:length(List_Subj)
 end
 
 %%
-Conds={'E','D'};
-Colors={[100,100,100
-    127,205,187
-    65,182,196
-    44,127,184
-    37,52,148]/256,...
+Conds={'D','E'};
+Colors={
     [100,100,100
     254,178,76
     253,141,60
     240,59,32
-    189,0,38]/256};
+    189,0,38]/256,...
+    [100,100,100
+    127,205,187
+    65,182,196
+    44,127,184
+    37,52,148]/256};
 
 
 %% LME on background and alpha peak
@@ -140,29 +141,20 @@ mdlb_2=fitlme(table_alpha,'Amp~1+BlockN+Elec+(1|SubID)');
 mdlb_3=fitlme(table_alpha,'Amp~1+BlockN+Cond+(1|SubID)');
 mdlb_4=fitlme(table_alpha,'Amp~1+BlockN*Cond+(1|SubID)');
 %%
+freqs=cfg.foi;
 FOI=[9 11]; % Freq Band of Interest
 figure; set(gcf,'Position',[64          33        1097         952]);
 for nCond=1:2
     for nB=1:5
-        subplot(3,5,5*(nCond-1)+nB);
-        Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{nCond},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
-        
-        simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
+        subplot(2,5,5*(nCond-1)+nB);
+        temp_topo=[];
+        for nEl=1:32
+        temp_topo(nEl)=nanmean(table_alpha.Amp(table_alpha.Cond==Conds{nCond} & table_alpha.BlockN==nB & table_alpha.ElecN==nEl));
+        end
+        simpleTopoPlot_ft(temp_topo', layout,'on',[],0,1);
+%         title(sprintf('%s - %s',Conds{nCond},thisChLabel));
         colorbar;
-        caxis([-1 1]*1.5);
+        caxis([.2 1]);
         format_fig;
     end
-end
-
-for nB=1:5
-    subplot(3,5,10+nB);
-    Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{1},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1))-...
-        squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{2},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
-    
-    simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-    title(sprintf('%s - %s','E vs D',thisChLabel));
-    colorbar;
-    caxis([-1 1]*0.3);
-    format_fig;
 end

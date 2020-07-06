@@ -36,7 +36,7 @@ for nS=1:length(List_Subj)
     fprintf('... condition %s\n',CondSubj(nS))
     
     %%% parameters of SW detection
-    paramSW.fixThr=50; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
+    paramSW.fixThr=75/2; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
     paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
     paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
     paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
@@ -78,7 +78,7 @@ for nS=1:length(List_Subj)
         slow_Waves=[slow_Waves ; thisE_Waves(temp_p2p>thr_Wave,:)];
     end
     File_Name2=File_Name(bound{1}(2)+1:end);
-        save([data_path filesep 'SW_fix50uV_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+        save([data_path filesep 'SW_fix37uV_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
 
 end
 

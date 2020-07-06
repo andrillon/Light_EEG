@@ -14,7 +14,7 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_fix50uV_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_fix37uV_CIfIfe_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
@@ -24,9 +24,9 @@ for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
-    %     if strcmp(File_Name,'TFe_ft_DLT018.mat')
-    %         continue;
-    %     end
+        if strcmp(File_Name,'SW_fix50uV_CIfIfe_ft_DLT016.mat')
+            continue;
+        end
     fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
@@ -94,10 +94,30 @@ P2P_mdl1=fitlme(table_SW,'P2P~1+BlockN*Cond+(1|SubID)');
 % posS_mdl1=fitlme(table_SW,'posS~1+BlockN*Cond+(1|SubID)');
 
 %% overall topo in both groups
+cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
+Cond={'D','E'};
+
+figure; set(gcf,'Position',[64          33        1097         952]);
+Cond={'D','E'};
+for nC=1:2
+        subplot(1,2,nC);
+        Dens_AVG=[];
+        for nEl=1:32
+%         Dens_AVG(nEl)= median((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.Elec == num2str(nEl))));%-...
+        Dens_AVG(nEl)= nanmean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ~= 1 & table_SW.Elec == num2str(nEl))));%-...
+%              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
+        end
+        
+        simpleTopoPlot_ft(Dens_AVG, layout,'labels',[],0,1);
+        title(sprintf('%s',Cond{nC}));
+        colormap(cmap);
+        colorbar;
+        caxis([0 1]*5);
+        format_fig;
+end
 
 %%
 figure;
-Cond={'D','E'};
 data=[];
 for nBl = 1:5
     for nC = 1:2
@@ -106,6 +126,9 @@ for nBl = 1:5
          semdata(nBl, nC) =sem(data{nBl, nC}); %-data{1, nC});
          
     end
+end
+for nC = 1:2
+        dataCond{nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC)));
 end
 hold on;
 hb(1)=errorbar((1:5)-0.05,meandata(:,1),semdata(:,1),'Color',Colors{2}(end,:),'LineWidth',3);
