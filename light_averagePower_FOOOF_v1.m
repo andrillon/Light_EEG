@@ -62,7 +62,9 @@ for nS=35 %1:length(List_Subj)
                 av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
             end
             catch
-               continue; 
+                       av_fooof_bg=[av_fooof_bg ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.background_params,2))]];
+                   av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+ continue; 
             end
         end
     end
