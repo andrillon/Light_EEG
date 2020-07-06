@@ -20,7 +20,7 @@ settings = struct();  % Use defaults
 av_fooof_bg=[];
 av_fooof_alpha=[];
 %% Loop across participants to extract power
-for nS=35 %1:length(List_Subj)
+for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
