@@ -28,9 +28,11 @@ for nS=1:length(List_Subj)
     if nS==1
         av_logPower=nan([length(List_Subj) size(TFRhann.powspctrm,1) size(TFRhann.powspctrm,2) size(TFRhann.powspctrm,3)]);
     end
-    av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm),4)));
+%     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(:,:,TFRhann.freq>16,:),3),[1 1 size(TFRhann.powspctrm,3) 1])),4)));
+    av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30)),4)));
+%     av_logPower_time(nS,:,:,:,:)=(squeeze(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30))));
     %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
-    
+
     %%% extract info
     bound{1}=findstr(File_Name,'_');
     bound{2}=findstr(File_Name,'.');
@@ -76,26 +78,30 @@ end
 
 
 %%
-thisChLabel='Pz';
-figure;
+theseChLabels={'Fz','Cz','Pz','Oz'};
+figure; set(gcf,'Position',[ 1     7   996   798]);
+for nChan=1:length(theseChLabels)
+    subplot(2,2,nChan);
+    thisChLabel=theseChLabels{nChan};
 for nCond=1:2
-    hold on;
-    hp=[];
-    for nBl=1:5
-        temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
-if nCond==1 && nBl==1
-            simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
-else
-    simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
-end
+        hold on;
+        hp=[];
+        for nBl=1:5
+            temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
+            if nCond==1 && nBl==1
+                simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
+            else
+                simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+            end
+        end
+        format_fig;
+        xlabel('Freq (Hz)');
+        ylabel('log(Power)');
+        %     legend(hp,{'B0','B1','B2','B3','B4'});
+        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
+        %     ylim([-5.5 0])
+        xlim([1 30])
     end
-    format_fig;
-    xlabel('Freq (Hz)');
-    ylabel('log(Power)');
-%     legend(hp,{'B0','B1','B2','B3','B4'});
-    title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-    ylim([-5.5 0])
-   xlim([1 30])
 end
 %%
 FOI=[6 11]; % Freq Band of Interest
@@ -106,9 +112,9 @@ for nCond=1:2
         Pow_AVG=squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{nCond},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
         
         simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
+        title(sprintf('%s',Conds{nCond}));
         colorbar;
-        caxis([-2 0]);
+        caxis([-3 -1.5]);
         format_fig;
     end
 end
@@ -119,8 +125,48 @@ for nB=1:5
         squeeze(mean(mean(mean(av_logPower(CondSubj==Conds{2},nB,:,freqs>FOI(1) & freqs<FOI(2)),4),2),1));
     
     simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
-    title(sprintf('%s - %s','E vs D',thisChLabel));
+    title(sprintf('%s','D - E'));
     colorbar;
-    caxis([-1 1]*1);
+    caxis([-1 1]*.5);
     format_fig;
 end
+
+%%
+cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
+thisChannel='Oz';
+figure;
+subplot(1,3,1);
+temp=squeeze(mean(mean(av_logPower_time(:,2:4,match_str(TFRhann.label,thisChannel),:,:),1),2));
+imagesc(TFRhann.time(TFRhann.time<-30),TFRhann.freq,temp);
+format_fig;
+set(gca,'YDir','normal');
+ylabel('Freq (Hz)')
+xlabel('Time (s)')
+title('All')
+ylim([5 15])
+caxis([-4 .5])
+colormap(cmap);
+
+subplot(1,3,2);
+temp=squeeze(mean(mean(av_logPower_time(CondSubj==Conds{1},2:4,match_str(TFRhann.label,thisChannel),:,:),1),2));
+imagesc(TFRhann.time(TFRhann.time<-30),TFRhann.freq,temp);
+format_fig;
+set(gca,'YDir','normal');
+ylabel('Freq (Hz)')
+xlabel('Time (s)')
+title('D')
+ylim([5 15])
+caxis([-4 .5])
+colormap(cmap);
+
+subplot(1,3,3);
+temp=squeeze(mean(mean(av_logPower_time(CondSubj==Conds{2},2:4,match_str(TFRhann.label,thisChannel),:,:),1),2));
+imagesc(TFRhann.time(TFRhann.time<-30),TFRhann.freq,temp);
+format_fig;
+set(gca,'YDir','normal');
+ylabel('Freq (Hz)')
+xlabel('Time (s)')
+title('E')
+ylim([5 15])
+caxis([-4 .5])
+colormap(cmap);

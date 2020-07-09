@@ -40,8 +40,8 @@ for nS=1:length(List_Subj)
     paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
     paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
     paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
-    paramSW.art_ampl=150; % Rejection criterion
-    paramSW.max_posampl=75; % Rejection criterion
+    paramSW.art_ampl=100; % Rejection criterion
+    paramSW.max_posampl=50; % Rejection criterion
     paramSW.max_Freq=7; % Rejection criterion
     
     %%% clean SW detection
