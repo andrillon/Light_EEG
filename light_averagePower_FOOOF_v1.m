@@ -44,7 +44,7 @@ for nS=1:length(List_Subj)
     CondSubj(nS)=SubInfo.Condition(find(~cellfun(@isempty,regexpi(SubInfo.PT_Code,CodeSubj))));
     fprintf('... condition %s\n',CondSubj(nS))
     
-    temp_pow=squeeze(mean(TFRhann.powspctrm,4));
+    temp_pow=squeeze(mean(TFRhann.powspctrm(:,:,:,TFRhann.time<-30),4));
     for nB=1:5
         for nE=1:32
             try
