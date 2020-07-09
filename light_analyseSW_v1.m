@@ -14,12 +14,13 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_fix37uV_CIfIfe_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
 SW_properties_all=[];
 SW_density=[];
+all_slow_Waves=[];
 for nS=1:length(List_Subj)
     
     %%% load data
@@ -30,6 +31,7 @@ for nS=1:length(List_Subj)
     fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
+    slow_Waves(slow_Waves(:,5)>120000,:)=[];
     
     %%% extract info
     bound{1}=findstr(File_Name,'_');
@@ -38,7 +40,7 @@ for nS=1:length(List_Subj)
     CondSubj(nS)=SubInfo.Condition(find(~cellfun(@isempty,regexpi(SubInfo.PT_Code,CodeSubj))));
     fprintf('... condition %s\n',CondSubj(nS))
     
-    
+    all_slow_Waves=[all_slow_Waves ; slow_Waves];
     for nBl=1:5
         temp_slow_Waves=slow_Waves(slow_Waves(:,2)==nBl,:);
         nout=histc(temp_slow_Waves(:,3),1:length(labels));
@@ -51,9 +53,9 @@ for nS=1:length(List_Subj)
         for nE=1:32
             SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE) mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1)]];
         end
-                    SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1) mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
-
-   end
+        SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1) mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
+        
+    end
     
 end
 
@@ -83,13 +85,13 @@ P2P_mdl1=fitlme(table_SW,'P2P~1+BlockN*Cond+(1|SubID)');
 
 % NegP_mdl0=fitlme(table_SW,'NegP~1+BlockN+(1|SubID)');
 % NegP_mdl1=fitlme(table_SW,'NegP~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % PosP_mdl0=fitlme(table_SW,'PosP~1+BlockN+(1|SubID)');
 % PosP_mdl1=fitlme(table_SW,'PosP~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % negS_mdl0=fitlme(table_SW,'negS~1+BlockN+(1|SubID)');
 % negS_mdl1=fitlme(table_SW,'negS~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % posS_mdl0=fitlme(table_SW,'posS~1+BlockN+(1|SubID)');
 % posS_mdl1=fitlme(table_SW,'posS~1+BlockN*Cond+(1|SubID)');
 %%
@@ -98,10 +100,11 @@ Cond={'D','E'};
 data=[];
 for nBl = 1:5
     for nC = 1:2
-        data{nBl, nC} = (table_SWall.NumW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-         meandata(nBl, nC) =mean(data{nBl, nC}./data{1, nC});
-         semdata(nBl, nC) =sem(data{nBl, nC}./data{1, nC});
-         
+        data{nBl, nC} = (table_SW.NumW(table_SW.Elec == '13' & table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl)));
+        %          data{nBl, nC} = (table_SWall.NumW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
+        meandata(nBl, nC) =nanmean(data{nBl, nC}./data{1, nC});
+        semdata(nBl, nC) =sem(data{nBl, nC}./data{1, nC});
+        
     end
 end
 hold on;
@@ -119,14 +122,14 @@ ylabel('Num SW (norm)')
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
 % h   = rm_raincloud(data, cl);
 % % set(gca, 'YLim', [-0.3 1.6]);
-% 
+%
 % data2=data;
 % for nBl = 2:5
 %     for nC = 1:2
 %         data2{nBl, nC} = data2{nBl, nC}./data2{1, nC}*100;
 %     end
 % end
-% 
+%
 % % make figure
 % figure;
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
@@ -167,5 +170,54 @@ for nBl=1:5
     colormap(cmap);
     colorbar;
     caxis([-1 1]*3);
+    format_fig;
+end
+
+
+%%
+%%
+cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
+Conds={'D','E'};
+Names={'A','D','E'};
+figure; set(gcf,'Position',[64          33        1097         450]);
+for np=1:3
+    subplot(1,3,np);
+    toplot=[];
+    for nE=1:32
+        if np==1
+            toplot(nE)=squeeze(mean(table_SW.NumW(table_SW.BlockN>1 & table_SW.Elec==num2str(nE))));
+        elseif np==2
+            toplot(nE)=squeeze(mean(table_SW.NumW(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='D')));
+        elseif np==3
+            toplot(nE)=squeeze(mean(table_SW.NumW(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='E')));
+        end
+    end
+    simpleTopoPlot_ft(toplot', layout,'on',[],0,1);
+    title(Names{np});
+    colormap(cmap);
+    colorbar;
+    caxis([0 1]*30);
+    format_fig;
+end
+
+%%
+figure; set(gcf,'Position',[64          33        1097         450]);
+for np=1:3
+    subplot(1,3,np);
+    toplot=[];
+    for nE=1:32
+        if np==1
+            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE))));
+        elseif np==2
+            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='D')));
+        elseif np==3
+            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='E')));
+        end
+    end
+    simpleTopoPlot_ft(toplot', layout,'on',[],0,1);
+    title(Names{np});
+    colormap(cmap);
+    colorbar;
+%     caxis([350 750]);
     format_fig;
 end
