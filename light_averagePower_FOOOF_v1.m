@@ -64,6 +64,9 @@ for nS=1:length(List_Subj)
             catch
                        av_fooof_bg=[av_fooof_bg ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.background_params,2))]];
                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+                   figure;
+                   plot(TFRhann.freq, squeeze(temp_pow(nB,nE,:)))
+                   title(File_Name)
  continue; 
             end
         end
