@@ -12,7 +12,7 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-load('LightEEG_ICA_EyeMovements.mat')
+load('LightEEG_ICA_EyeMovements_v2.mat')
 List_Subj=dir([data_path filesep 'Ife_*.mat']);
 
 %% Loop across participants to extract power
