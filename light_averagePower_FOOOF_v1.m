@@ -44,7 +44,7 @@ for nS=1:length(List_Subj)
     CondSubj(nS)=SubInfo.Condition(find(~cellfun(@isempty,regexpi(SubInfo.PT_Code,CodeSubj))));
     fprintf('... condition %s\n',CondSubj(nS))
     
-    temp_pow=squeeze(mean(TFRhann.powspctrm,4));
+    temp_pow=squeeze(mean(TFRhann.powspctrm(:,:,:,TFRhann.time<-30),4));
     for nB=1:5
         for nE=1:32
             try
@@ -64,6 +64,9 @@ for nS=1:length(List_Subj)
             catch
                        av_fooof_bg=[av_fooof_bg ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.background_params,2))]];
                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+                   figure;
+                   plot(TFRhann.freq, squeeze(temp_pow(nB,nE,:)))
+                   title(File_Name)
  continue; 
             end
         end

@@ -1,2 +1,5 @@
 localdef_ligthEEG.m
 *.m~
+Trial2.m
+.DS_Store
+.DS_Store
