@@ -25,14 +25,18 @@ for nS=1:length(List_Subj)
     fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
+    if length(TFRhann.label)~=32
+        warning(sprintf('not enough channels (n=%g)',length(TFRhann.label)))
+        continue;
+    end
     if nS==1
         av_logPower=nan([length(List_Subj) size(TFRhann.powspctrm,1) size(TFRhann.powspctrm,2) size(TFRhann.powspctrm,3)]);
     end
-%     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(:,:,TFRhann.freq>16,:),3),[1 1 size(TFRhann.powspctrm,3) 1])),4)));
+    %     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(:,:,TFRhann.freq>16,:),3),[1 1 size(TFRhann.powspctrm,3) 1])),4)));
     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30)),4)));
-%     av_logPower_time(nS,:,:,:,:)=(squeeze(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30))));
+    %     av_logPower_time(nS,:,:,:,:)=(squeeze(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30))));
     %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
-
+    
     %%% extract info
     bound{1}=findstr(File_Name,'_');
     bound{2}=findstr(File_Name,'.');
@@ -83,7 +87,7 @@ figure; set(gcf,'Position',[ 1     7   996   798]);
 for nChan=1:length(theseChLabels)
     subplot(2,2,nChan);
     thisChLabel=theseChLabels{nChan};
-for nCond=1:2
+    for nCond=1:2
         hold on;
         hp=[];
         for nBl=1:5

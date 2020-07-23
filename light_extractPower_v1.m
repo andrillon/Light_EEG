@@ -34,7 +34,7 @@ for nS=1:length(List_Subj)
     cfg.toi          = [-4*60:0.5:0];                         % time
     cfg.keeptrials  = 'yes';
     TFRhann = ft_freqanalysis(cfg, data);
-    save([data_path filesep 'TF' File_Name],'TFRhann','cfg');
+    save([data_path filesep 'TF2' File_Name],'TFRhann','cfg');
 
 %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
 end

@@ -37,7 +37,7 @@ for nS=1:length(List_Subj)
     
     %%% parameters of SW detection
     paramSW.fixThr=[]; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
-    paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
+    paramSW.prticle_Thr=80; % Choose percentile that you want to select: 80 or 90 or 95
     paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
     paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
     paramSW.art_ampl=100; % Rejection criterion
@@ -63,10 +63,10 @@ for nS=1:length(List_Subj)
             thr_Wave=prctile(thisE_Waves(:,paramSW.AmpCriterionIdx),paramSW.prticle_Thr);
         end
         sw_thr=[sw_thr ; [nS 1 nE CondSubj(nS)=='E' thr_Wave]];
-        if thr_Wave>80
-            labels{nE}
-            pause;
-        end
+%         if thr_Wave>80
+%             labels{nE}
+%             pause;
+%         end
     end
     
     slow_Waves=[];
@@ -81,7 +81,7 @@ for nS=1:length(List_Subj)
         slow_Waves=[slow_Waves ; thisE_Waves(temp_p2p>thr_Wave,:)];
     end
     File_Name2=File_Name(bound{1}(2)+1:end);
-    save([data_path filesep 'SW_90P2PbyE_basel_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+    save([data_path filesep 'SW_80P2PbyE_basel_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
     
 end
 

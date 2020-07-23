@@ -16,7 +16,7 @@ load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'CIfIfe_*.mat']);
 
 %% Loop across participants to extract power
-redo=0;
+redo=1;
 for nS=1:length(List_Subj)
     
     %%% load data
@@ -24,7 +24,7 @@ for nS=1:length(List_Subj)
     %     if strcmp(File_Name,'TFe_ft_DLT018.mat')
     %         continue;
     %     end
-    if redo==1 || exist([data_path filesep 'SW_all_' File_Name])==0
+    if redo==1 || exist([data_path filesep 'SW2_all_' File_Name])==0
         fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
         File_Path = List_Subj(nS).folder;
         load([data_path filesep File_Name]);
@@ -61,7 +61,7 @@ for nS=1:length(List_Subj)
         end
         labels=data.label;
         Fs=data.fsample;
-        save([data_path filesep 'SW_all_' File_Name],'all_Waves','labels','Fs');
+        save([data_path filesep 'SW2_all_' File_Name],'all_Waves','labels','Fs');
     else
         fprintf('... skipping %s (%g/%g)\n',File_Name,nS,length(List_Subj))
     end

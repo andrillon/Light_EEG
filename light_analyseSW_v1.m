@@ -14,7 +14,7 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_fix37uV_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_80P2PbyE_basel_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
@@ -47,13 +47,13 @@ for nS=1:length(List_Subj)
         if size(nout,1)>size(nout,2)
             nout=nout';
         end
-        nout=nout/5; % SW density in minutes
+        nout=nout/4.5; % SW density in minutes
         
         SW_density=[SW_density ; [nS nBl CondSubj(nS)=='E' nout]];
         for nE=1:32
             SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE) mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1)]];
         end
-        SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1) mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
+        SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1)/4.5/32 mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
         
     end
     
@@ -100,10 +100,10 @@ Cond={'D','E'};
 data=[];
 for nBl = 1:5
     for nC = 1:2
-        data{nBl, nC} = (table_SW.NumW(table_SW.Elec == '13' & table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl)));
-        %          data{nBl, nC} = (table_SWall.NumW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-        meandata(nBl, nC) =nanmean(data{nBl, nC}./data{1, nC});
-        semdata(nBl, nC) =sem(data{nBl, nC}./data{1, nC});
+%         data{nBl, nC} = (table_SW.NumW(table_SW.Elec == '17' & table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl)));
+                 data{nBl, nC} = (table_SWall.NumW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
+        meandata(nBl, nC) =nanmean(data{nBl, nC}); %./data{1, nC});
+        semdata(nBl, nC) =sem(data{nBl, nC}); %./data{1, nC});
         
     end
 end
@@ -116,7 +116,7 @@ scatter((1:5)+0.05,meandata(:,2),'Marker','o','SizeData',144,'MarkerEdgeColor',C
 legend(hb,{'D','E'})
 format_fig;
 xlabel('Block')
-ylabel('Num SW (norm)')
+ylabel('Num SW')
 % % make figure
 % figure;
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
@@ -207,11 +207,11 @@ for np=1:3
     toplot=[];
     for nE=1:32
         if np==1
-            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE))));
+            toplot(nE)=squeeze(nanmean(table_SW.negS(table_SW.BlockN>1 & table_SW.Elec==num2str(nE))));
         elseif np==2
-            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='D')));
+            toplot(nE)=squeeze(nanmean(table_SW.negS(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='D')));
         elseif np==3
-            toplot(nE)=squeeze(nanmean(table_SW.P2P(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='E')));
+            toplot(nE)=squeeze(nanmean(table_SW.negS(table_SW.BlockN>1 & table_SW.Elec==num2str(nE) & table_SW.Cond=='E')));
         end
     end
     simpleTopoPlot_ft(toplot', layout,'on',[],0,1);
