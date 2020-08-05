@@ -12,10 +12,10 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'e_*.mat']);
+List_Subj=dir([data_path filesep 'ie_*.mat']);
 
 %% Loop across participants to extract power
-for nS=1:length(List_Subj)
+for nS=25 %1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
@@ -42,11 +42,17 @@ for nS=1:length(List_Subj)
     cfg.dftfilter      = 'yes';        % enable notch filtering to eliminate power line noise
     cfg.dftfreq        = [50]; % set up the frequencies for notch filtering
     
+    SubID=File_Name; beg=findstr(SubID,'_'); SubID=SubID(beg(2)+1:end-4);
+    if strcmp(SubID,'DLT026')
+        cfg.trials        =[1 3:5];
+    end
     data = ft_preprocessing(cfg,data);
     
     %%% run ICA
+    rankICA = rank(data.trial{1,1});
     cfg        = [];
     cfg.method = 'runica'; % this is the default and uses the implementation from EEGLAB
+    cfg.numcomponent = rankICA;
     comp = ft_componentanalysis(cfg, data);
-    save([data_path filesep 'If' File_Name],'data','comp');
+    save([data_path filesep 'If' File_Name],'data','comp','rankICA');
 end
