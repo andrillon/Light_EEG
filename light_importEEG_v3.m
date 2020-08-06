@@ -18,7 +18,7 @@ List_Subj=dir([data_path filesep '*/*.eeg']);
 %% Loop across participants to extract power
 duration_epoch=[-4.5 0.5]; % in minutes
 nc=0;
-for nS=25 %1:length(List_Subj)
+for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
@@ -75,7 +75,7 @@ for nS=25 %1:length(List_Subj)
     
     data = ft_preprocessing(cfg,data);
     %     data.label(match_str(hdr.label,'Tp10'))={'TP10'};
-    save([data_path filesep 'ie_ft_' File_Name(1:end-4)],'data','cfg');
+    save([data_path filesep 're_ft_' File_Name(1:end-4)],'data','cfg');
 end
 
 

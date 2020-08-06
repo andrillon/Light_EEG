@@ -6,14 +6,14 @@ close all
 run localdef_ligthEEG.m
 addpath(path_fieldtrip); % Filedtrip toolbox (EEG)
 ft_defaults; % Set up fieldtrip toolbox
-mkdir([data_path filesep 'fig_Comp2']);
+mkdir([data_path filesep 'fig_Comp4']);
 
 %% specify data file
 
-List_Subj=dir([data_path filesep 'Ifie_ft_*.mat']);
+List_Subj=dir([data_path filesep 'Ifre_ft_*.mat']);
 
 %% plot the components for visual inspection
-for nS=25:length(List_Subj)
+for nS=11 %:length(List_Subj)
     
     File_Name = List_Subj(nS).name;
     File_Path = List_Subj(nS).folder;
@@ -27,6 +27,6 @@ for nS=25:length(List_Subj)
     ft_topoplotIC(cfg, comp)
     
     set(gcf, 'Position', get(0, 'Screensize'));
-    print(gcf, [data_path filesep 'fig_Comp3' filesep  File_Name '.png'], '-dpng');
+    print(gcf, [data_path filesep 'fig_Comp4' filesep  File_Name '.png'], '-dpng');
     close(gcf);
 end

@@ -12,10 +12,10 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'ie_*.mat']);
+List_Subj=dir([data_path filesep 're_*.mat']);
 
 %% Loop across participants to extract power
-for nS=25 %1:length(List_Subj)
+for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
