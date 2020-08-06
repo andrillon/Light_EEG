@@ -13,7 +13,7 @@ mkdir([data_path filesep 'fig_Comp4']);
 List_Subj=dir([data_path filesep 'Ifre_ft_*.mat']);
 
 %% plot the components for visual inspection
-for nS=11 %:length(List_Subj)
+for nS=1:length(List_Subj)
     
     File_Name = List_Subj(nS).name;
     File_Path = List_Subj(nS).folder;
