@@ -4,6 +4,7 @@ run localdef_ligthEEG.m
 % spm12 and LSCPtools
 addpath((path_fieldtrip));
 ft_defaults;
+load('cain_elecloc_32ch_layout.mat');
 
 %% choose and load subject
 List_Subj=dir([data_path filesep 'Ifre_*.mat']);
