@@ -12,7 +12,7 @@ ft_defaults; % Set up fieldtrip toolbox
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'TFCIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'TF2CIfIfre_*.mat']);
 
 %% Loop across participants to extract power
 for nS=1:length(List_Subj)
@@ -31,6 +31,9 @@ for nS=1:length(List_Subj)
     end
     if nS==1
         av_logPower=nan([length(List_Subj) size(TFRhann.powspctrm,1) size(TFRhann.powspctrm,2) size(TFRhann.powspctrm,3)]);
+    end
+    if size(TFRhann.powspctrm,1)==4
+        continue;
     end
     %     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(:,:,TFRhann.freq>16,:),3),[1 1 size(TFRhann.powspctrm,3) 1])),4)));
     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30)),4)));

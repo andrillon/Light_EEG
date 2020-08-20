@@ -13,7 +13,7 @@ addpath(genpath(fooof_path))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_all_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_all_CIfIfre_*.mat']);
 
 sw_thr=[];
 %% Loop across participants to extract power
@@ -37,11 +37,11 @@ for nS=1:length(List_Subj)
     
     %%% parameters of SW detection
     paramSW.fixThr=[]; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
-    paramSW.prticle_Thr=80; % Choose percentile that you want to select: 80 or 90 or 95
+    paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
     paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
     paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
-    paramSW.art_ampl=100; % Rejection criterion
-    paramSW.max_posampl=50; % Rejection criterion
+    paramSW.art_ampl=150; % Rejection criterion
+    paramSW.max_posampl=75; % Rejection criterion
     paramSW.max_Freq=7; % Rejection criterion
     
     %%% clean SW detection
@@ -63,10 +63,10 @@ for nS=1:length(List_Subj)
             thr_Wave=prctile(thisE_Waves(:,paramSW.AmpCriterionIdx),paramSW.prticle_Thr);
         end
         sw_thr=[sw_thr ; [nS 1 nE CondSubj(nS)=='E' thr_Wave]];
-%         if thr_Wave>80
-%             labels{nE}
-%             pause;
-%         end
+        %         if thr_Wave>80
+        %             labels{nE}
+        %             pause;
+        %         end
     end
     
     slow_Waves=[];
@@ -81,25 +81,40 @@ for nS=1:length(List_Subj)
         slow_Waves=[slow_Waves ; thisE_Waves(temp_p2p>thr_Wave,:)];
     end
     File_Name2=File_Name(bound{1}(2)+1:end);
-    save([data_path filesep 'SW_80P2PbyE_basel_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+    save([data_path filesep 'SW_90P2PbyE_depleted_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
     
 end
 
 %%
-cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
+cmap=colormap('parula'); %cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to red (64)
 figure; %set(gcf,'Position',[64          33        1097         952]);
-Conds={'D','E'};
-for nC=1:2
-    subplot(1,2,nC);
-    ThresholdSW_All=sw_thr(sw_thr(:, 4) == nC-1,5);
-    ThresholdSW_Group=sw_thr(sw_thr(:, 4) == nC-1,3);
-    ThresholdSW=grpstats(ThresholdSW_All,ThresholdSW_Group,'mean');
-    
-    simpleTopoPlot_ft(ThresholdSW, layout,'labels',[],0,1);
+Conds={'D','E','D-E'};
+for nC=1:3
+    subplot(1,3,nC);
+    if nC==3
+        ThresholdSW_All1=sw_thr(sw_thr(:, 4) == 1-1,5);
+        ThresholdSW_Group1=sw_thr(sw_thr(:, 4) == 1-1,3);
+        ThresholdSW1=grpstats(ThresholdSW_All1,ThresholdSW_Group1,'mean');
+        
+        ThresholdSW_All2=sw_thr(sw_thr(:, 4) == 2-1,5);
+        ThresholdSW_Group2=sw_thr(sw_thr(:, 4) == 2-1,3);
+        ThresholdSW2=grpstats(ThresholdSW_All2,ThresholdSW_Group2,'mean');
+        
+        ThresholdSW=ThresholdSW1-ThresholdSW2;
+    else
+        ThresholdSW_All=sw_thr(sw_thr(:, 4) == nC-1,5);
+        ThresholdSW_Group=sw_thr(sw_thr(:, 4) == nC-1,3);
+        ThresholdSW=grpstats(ThresholdSW_All,ThresholdSW_Group,'mean');
+    end
+    simpleTopoPlot_ft(ThresholdSW, layout,'on',[],0,1);
     title(sprintf('%s',Conds{nC}));
     colormap(cmap);
     colorbar;
-    caxis([20 40]);
+    if nC==3
+        caxis([-1 1]*12);
+    else
+        caxis([20 40]);
+    end
     format_fig;
 end
 
@@ -117,6 +132,6 @@ for nC=1:2
     title(sprintf('%s',Conds{nC}));
     colormap(cmap);
     colorbar;
-%     caxis([20 40]);
+    %     caxis([20 40]);
     format_fig;
 end

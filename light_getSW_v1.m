@@ -13,18 +13,18 @@ addpath(genpath(fooof_path))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'CIfIfre_*.mat']);
 
 %% Loop across participants to extract power
 redo=1;
-for nS=1:length(List_Subj)
+for nS=25:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
     %     if strcmp(File_Name,'TFe_ft_DLT018.mat')
     %         continue;
     %     end
-    if redo==1 || exist([data_path filesep 'SW2_all_' File_Name])==0
+    if redo==1 || exist([data_path filesep 'SW_all_' File_Name])==0
         fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
         File_Path = List_Subj(nS).folder;
         load([data_path filesep File_Name]);
@@ -38,7 +38,7 @@ for nS=1:length(List_Subj)
         fprintf('... condition %s\n',CondSubj(nS))
         
         all_Waves=[];
-        for nB=1:5
+        for nB=1:length(data.trial)
             this_data=data.trial{nB};
             this_data=this_data-repmat(mean(this_data(match_str(data.label,{'TP9','TP10'}),:),1),[size(this_data,1), 1]);
             [twa_results]=twalldetectnew_TA_v2(this_data,data.fsample,0);
@@ -61,7 +61,7 @@ for nS=1:length(List_Subj)
         end
         labels=data.label;
         Fs=data.fsample;
-        save([data_path filesep 'SW2_all_' File_Name],'all_Waves','labels','Fs');
+        save([data_path filesep 'SW_all_' File_Name],'all_Waves','labels','Fs');
     else
         fprintf('... skipping %s (%g/%g)\n',File_Name,nS,length(List_Subj))
     end

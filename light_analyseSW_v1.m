@@ -14,7 +14,7 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_80P2PbyE_basel_*.mat']);
+List_Subj=dir([data_path filesep 'SW_90P2PbyE_basel_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
