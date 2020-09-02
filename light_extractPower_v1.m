@@ -15,7 +15,7 @@ load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'CIfre_ft_*.mat']);
 
 %% Loop across participants to extract power
-for nS=16:length(List_Subj)
+for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
