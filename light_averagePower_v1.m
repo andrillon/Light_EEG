@@ -80,7 +80,7 @@ for nCond=1:2
     ylabel('log(Power)');
     legend(hp,{'B0','B1','B2','B3','B4'});
     title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-    ylim([-4 6])
+%     ylim([-4 6])
 end
 
 
