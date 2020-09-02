@@ -13,7 +13,7 @@ addpath(genpath(fooof_path))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_all_CIfIfre_*.mat']);
+List_Subj=dir([data_path filesep 'SW_all_CIfre_ft_*.mat']);
 
 sw_thr=[];
 %% Loop across participants to extract power
@@ -52,7 +52,7 @@ for nS=1:length(List_Subj)
     fprintf('... ... %g %% waves discarded because of max pos ampl\n',mean(all_Waves(:,11)>paramSW.max_posampl | all_Waves(:,14)>paramSW.art_ampl| abs(all_Waves(:,15))>paramSW.art_ampl)*100)
     all_Waves(all_freq>paramSW.max_Freq | all_Waves(:,paramSW.AmpCriterionIdx)>paramSW.art_ampl | all_Waves(:,11)>paramSW.max_posampl| all_Waves(:,14)>paramSW.art_ampl| abs(all_Waves(:,15))>paramSW.art_ampl,:)=[];
     
-    %%% define SW threshold on baselone
+    %%% define SW threshold on baseline
     for nE=1:length(labels)
         thisE_Waves=all_Waves(all_Waves(:,2)==1 & all_Waves(:,3)==nE,:);
         temp_p2p=thisE_Waves(:,paramSW.AmpCriterionIdx);
@@ -81,7 +81,7 @@ for nS=1:length(List_Subj)
         slow_Waves=[slow_Waves ; thisE_Waves(temp_p2p>thr_Wave,:)];
     end
     File_Name2=File_Name(bound{1}(2)+1:end);
-    save([data_path filesep 'SW_90P2PbyE_depleted_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+    save([data_path filesep 'SW_90P2PbyE_baseline_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
     
 end
 

@@ -13,7 +13,7 @@ addpath(genpath(fooof_path))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'CIfIfre_*.mat']);
+List_Subj=dir([data_path filesep 'CIfre_ft_*.mat']);
 
 %% Loop across participants to extract power
 redo=1;

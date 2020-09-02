@@ -53,12 +53,15 @@ end
 for i=1:length(event)
 % if strcmp(event(i).type, cfg.trialdef.eventtype)
   % it is a trigger, see whether it has the right value
-  if ismember(event(i).value, cfg.trialdef.eventvalue)
-    % add this to the trl definition
-    begsample     = event(i).sample - cfg.trialdef.prestim*hdr.Fs;
-    endsample     = event(i).sample + cfg.trialdef.poststim*hdr.Fs - 1;
-    offset        = -cfg.trialdef.prestim*hdr.Fs;   
-    trl(end+1, :) = [round([begsample endsample offset])];
+  if ~isempty(find(~(cellfun(@isempty,regexpi(event(i).value,cfg.trialdef.eventvalue))))) %ismember(event(i).value, cfg.trialdef.eventvalue)
+      if ~isempty(find(~(cellfun(@isempty,regexpi(event(i).value,cfg.trialdef.eventvalue(1))))))
+          event(i).sample=event(i).sample+5*60*hdr.Fs;        
+      end
+          % add this to the trl definition
+          begsample     = event(i).sample - cfg.trialdef.prestim*hdr.Fs;
+          endsample     = event(i).sample + cfg.trialdef.poststim*hdr.Fs - 1;
+          offset        = -cfg.trialdef.prestim*hdr.Fs;
+          trl(end+1, :) = [round([begsample endsample offset])];
   end
 % end
 end
