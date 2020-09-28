@@ -13,7 +13,7 @@ ft_defaults; % Set up fieldtrip toolbox
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
 % load('LightEEG_ICA_EyeMovements_v2.mat')
-run ICA_BadComponents_v3.m
+load LightEEG_ICA_V4.mat
 List_Subj=dir([data_path filesep 're_*.mat']);
 
 %% Loop across participants to extract power
@@ -28,8 +28,8 @@ for nS=1:length(List_Subj)
     
     %%% Re-reference to average THOMAS ADDS DETREND
     cfg = [];
-    %     eval(sprintf('cfg.component = %s;',BadComponents.Eyemovement{match_str(BadComponents.Participant,File_Name(8:13))})); % to be removed component(s)
-    cfg.component=BadComponents{match_str(BadComponents(:,1),File_Name(7:12)),2};
+    eval(sprintf('cfg.component = %s;',BadComponents.Eyemovement{match_str(BadComponents.Participant,File_Name(8:13))})); % to be removed component(s)
+    %     cfg.component=BadComponents{match_str(BadComponents(:,1),File_Name(7:12)),2};
     data = ft_rejectcomponent(cfg, comp, data);
     save([data_path filesep 'CIf' File_Name],'data');
     
