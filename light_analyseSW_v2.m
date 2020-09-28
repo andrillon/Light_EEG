@@ -14,7 +14,7 @@ addpath(genpath(path_raincloud))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'SW_fix37uV_CIfIfe_*.mat']);
+List_Subj=dir([data_path filesep 'SW_90P2PbyE_baseline_*.mat']);
 
 %% Loop across participants to extract power
 SW_properties=[];
@@ -24,9 +24,9 @@ for nS=1:length(List_Subj)
     
     %%% load data
     File_Name = List_Subj(nS).name;
-        if strcmp(File_Name,'SW_fix50uV_CIfIfe_ft_DLT016.mat')
-            continue;
-        end
+    if strcmp(File_Name,'SW_fix50uV_CIfIfe_ft_DLT016.mat')
+        continue;
+    end
     fprintf('... processing %s (%g/%g)',File_Name,nS,length(List_Subj))
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
@@ -41,6 +41,8 @@ for nS=1:length(List_Subj)
     
     for nBl=1:5
         temp_slow_Waves=slow_Waves(slow_Waves(:,2)==nBl,:);
+            all_freq=1./(abs((temp_slow_Waves(:,5)-temp_slow_Waves(:,7)))./Fs);
+
         nout=histc(temp_slow_Waves(:,3),1:length(labels));
         if size(nout,1)>size(nout,2)
             nout=nout';
@@ -49,16 +51,16 @@ for nS=1:length(List_Subj)
         
         SW_density=[SW_density ; [nS nBl CondSubj(nS)=='E' nout]];
         for nE=1:32
-            SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE)/4 mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1)]];
+            SW_properties=[SW_properties ; [nS nBl CondSubj(nS)=='E' nE sum(temp_slow_Waves(:,3)==nE)/4 mean(temp_slow_Waves(temp_slow_Waves(:,3)==nE,[4 9 11 12 13]),1) mean(all_freq(temp_slow_Waves(:,3)==nE))]];
         end
-                    SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1)/4/32 mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
-
-   end
+        SW_properties_all=[SW_properties_all ; [nS nBl CondSubj(nS)=='E' nE size(temp_slow_Waves,1)/4/32 mean(temp_slow_Waves(:,[4 9 11 12 13]),1)]];
+        
+    end
     
 end
 
 %%
-table_SW=array2table(SW_properties,'VariableNames',{'SubID','BlockN','Cond','Elec','DensW','P2P','NegP','PosP','negS','posS'});
+table_SW=array2table(SW_properties,'VariableNames',{'SubID','BlockN','Cond','Elec','DensW','P2P','NegP','PosP','negS','posS','Freq'});
 table_SWall=array2table(SW_properties_all,'VariableNames',{'SubID','BlockN','Cond','Elec','DensW','P2P','NegP','PosP','negS','posS'});
 
 table_SW.SubID=categorical(table_SW.SubID);
@@ -83,13 +85,13 @@ P2P_mdl1=fitlme(table_SW,'P2P~1+BlockN*Cond+(1|SubID)');
 
 % NegP_mdl0=fitlme(table_SW,'NegP~1+BlockN+(1|SubID)');
 % NegP_mdl1=fitlme(table_SW,'NegP~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % PosP_mdl0=fitlme(table_SW,'PosP~1+BlockN+(1|SubID)');
 % PosP_mdl1=fitlme(table_SW,'PosP~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % negS_mdl0=fitlme(table_SW,'negS~1+BlockN+(1|SubID)');
 % negS_mdl1=fitlme(table_SW,'negS~1+BlockN*Cond+(1|SubID)');
-% 
+%
 % posS_mdl0=fitlme(table_SW,'posS~1+BlockN+(1|SubID)');
 % posS_mdl1=fitlme(table_SW,'posS~1+BlockN*Cond+(1|SubID)');
 
@@ -100,20 +102,20 @@ Cond={'D','E'};
 figure; set(gcf,'Position',[64          33        1097         952]);
 Cond={'D','E'};
 for nC=1:2
-        subplot(1,2,nC);
-        Dens_AVG=[];
-        for nEl=1:32
-%         Dens_AVG(nEl)= median((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.Elec == num2str(nEl))));%-...
+    subplot(1,2,nC);
+    Dens_AVG=[];
+    for nEl=1:32
+        %         Dens_AVG(nEl)= median((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.Elec == num2str(nEl))));%-...
         Dens_AVG(nEl)= nanmean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ~= 1 & table_SW.Elec == num2str(nEl))));%-...
-%              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
-        end
-        
-        simpleTopoPlot_ft(Dens_AVG, layout,'labels',[],0,1);
-        title(sprintf('%s',Cond{nC}));
-        colormap(cmap);
-        colorbar;
-        caxis([0 1]*5);
-        format_fig;
+        %              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
+    end
+    
+    simpleTopoPlot_ft(Dens_AVG, layout,'labels',[],0,1);
+    title(sprintf('%s',Cond{nC}));
+    colormap(cmap);
+    colorbar;
+    %         caxis([0 1]*5);
+    format_fig;
 end
 
 %%
@@ -122,13 +124,13 @@ data=[];
 for nBl = 1:5
     for nC = 1:2
         data{nBl, nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-         meandata(nBl, nC) =mean(data{nBl, nC}); %-data{1, nC});
-         semdata(nBl, nC) =sem(data{nBl, nC}); %-data{1, nC});
-         
+        meandata(nBl, nC) =mean(data{nBl, nC}); %-data{1, nC});
+        semdata(nBl, nC) =sem(data{nBl, nC}); %-data{1, nC});
+        
     end
 end
 for nC = 1:2
-        dataCond{nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC)));
+    dataCond{nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC)));
 end
 hold on;
 hb(1)=errorbar((1:5)-0.05,meandata(:,1),semdata(:,1),'Color',Colors{2}(end,:),'LineWidth',3);
@@ -145,14 +147,14 @@ ylabel('SW/min/elec (norm)')
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
 % h   = rm_raincloud(data, cl);
 % % set(gca, 'YLim', [-0.3 1.6]);
-% 
+%
 % data2=data;
 % for nBl = 2:5
 %     for nC = 1:2
 %         data2{nBl, nC} = data2{nBl, nC}./data2{1, nC}*100;
 %     end
 % end
-% 
+%
 % % make figure
 % figure;
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
@@ -169,8 +171,8 @@ for nC=1:2
         subplot(2,4,4*(nC-1)+(nBl-1));
         Dens_AVG=[];
         for nEl=1:32
-        Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl))));%-...
-%              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
+            Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl))));%-...
+            %              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
         end
         
         simpleTopoPlot_ft(Dens_AVG, layout,'on',[],0,1);

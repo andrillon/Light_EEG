@@ -13,13 +13,15 @@ addpath(genpath(fooof_path))
 %% List files and retrieve layout
 load('light_subinfo.mat');
 load('cain_elecloc_32ch_layout.mat');
-List_Subj=dir([data_path filesep 'TF2CIfIfre_*.mat']);
+List_Subj=dir([data_path filesep 'TFCIfre_ft_*.mat']);
 
 f_range = [2, 40];
 settings = struct();  % Use defaults
 av_fooof_bg=[];
 av_fooof_alpha=[];
+av_fooof_theta=[];
 av_fooof_peaks=[];
+av_fooof_maxalphatheta=[];
 %% Loop across participants to extract power
 for nS=1:length(List_Subj)
     
@@ -60,15 +62,42 @@ for nS=1:length(List_Subj)
                 av_fooof_bg=[av_fooof_bg ; [nS nB nE CondSubj(nS)=='E' fooof_results.background_params]];
                 av_fooof_peaks=[av_fooof_peaks ; [repmat([nS nB nE CondSubj(nS)=='E'],size(fooof_results.peak_params,1),1) fooof_results.peak_params]];
                 
-                [closestvalue,index]=findclosest(fooof_results.peak_params(:,1),10);
-                if closestvalue>7 && closestvalue<12
-                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' fooof_results.peak_params(index,:)]];
+                sub_freqpeaks=fooof_results.peak_params;
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,1)>9.5 & sub_freqpeaks(:,1)<14,:);
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,2)==max(sub_freqpeaks(:,2)),:);
+                if ~isempty(sub_freqpeaks)
+                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' sub_freqpeaks]];
                 else
-                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+                    av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,3)]];
+                end
+                %                 [closestvalue,index]=findclosest(fooof_results.peak_params(:,1),10);
+                %                 if closestvalue>9 && closestvalue<12
+                %                     av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' fooof_results.peak_params(index,:)]];
+                %                 else
+                %                     av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+                %                 end
+                
+                sub_freqpeaks=fooof_results.peak_params;
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,1)>5 & sub_freqpeaks(:,1)<9.5,:);
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,2)==max(sub_freqpeaks(:,2)),:);
+                if ~isempty(sub_freqpeaks)
+                    av_fooof_theta=[av_fooof_theta ; [nS nB nE CondSubj(nS)=='E' sub_freqpeaks]];
+                else
+                    av_fooof_theta=[av_fooof_theta ; [nS nB nE CondSubj(nS)=='E' nan(1,3)]];
+                end
+                
+                sub_freqpeaks=fooof_results.peak_params;
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,1)>5 & sub_freqpeaks(:,1)<14,:);
+                sub_freqpeaks=sub_freqpeaks(sub_freqpeaks(:,2)==max(sub_freqpeaks(:,2)),:);
+                if ~isempty(sub_freqpeaks)
+                    av_fooof_maxalphatheta=[av_fooof_maxalphatheta ; [nS nB nE CondSubj(nS)=='E' sub_freqpeaks]];
+                else
+                    av_fooof_maxalphatheta=[av_fooof_maxalphatheta ; [nS nB nE CondSubj(nS)=='E' nan(1,3)]];
                 end
             catch
                 av_fooof_bg=[av_fooof_bg ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.background_params,2))]];
                 av_fooof_alpha=[av_fooof_alpha ; [nS nB nE CondSubj(nS)=='E' nan(1,size(fooof_results.peak_params,2))]];
+                av_fooof_maxalphatheta=[av_fooof_maxalphatheta ; [nS nB nE CondSubj(nS)=='E' nan(1,3)]];
                 figure;
                 plot(TFRhann.freq, squeeze(temp_pow(nB,nE,:)))
                 title(File_Name)
@@ -265,3 +294,24 @@ for nCond=1:3
         format_fig;
     end
 end
+
+%%
+table_peaks=array2table(av_fooof_peaks,'VariableNames',{'SubID','BlockN','ElecN','CondF','Freq','Amp','BW'});
+table_alpha=array2table(av_fooof_alpha,'VariableNames',{'SubID','BlockN','ElecN','CondF','Freq','Amp','BW'});
+table_theta=array2table(av_fooof_theta,'VariableNames',{'SubID','BlockN','ElecN','CondF','Freq','Amp','BW'});
+table_thetaalpha=array2table(av_fooof_maxalphatheta,'VariableNames',{'SubID','BlockN','ElecN','CondF','Freq','Amp','BW'});
+
+figure;
+histogram(table_theta.Freq(table_theta.BlockN>1 & table_theta.CondF==0),1:0.5:30,'Normalization','Count','FaceColor',Colors{1}(5,:))
+hold on
+histogram(table_theta.Freq(table_theta.BlockN>1 & table_theta.CondF==1),1:0.5:30,'Normalization','Count','FaceColor',Colors{2}(5,:))
+format_fig;
+xlabel('Peak Frequency (Hz)')
+ylabel('Probability')
+legend({'R','B'})
+
+% look at proportion, amplitude and freq of theta and alpha band peaks by
+% electrodes and condition
+
+% combining alpha and theta, look at the highest peak and what is it's
+% frequency

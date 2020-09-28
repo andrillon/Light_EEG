@@ -41,7 +41,7 @@ for nS=1:length(List_Subj)
         for nB=1:length(data.trial)
             this_data=data.trial{nB};
             this_data=this_data-repmat(mean(this_data(match_str(data.label,{'TP9','TP10'}),:),1),[size(this_data,1), 1]);
-            [twa_results]=twalldetectnew_TA_v2(this_data,data.fsample,0);
+            [twa_results]=twalldetectnew_TA_theta_v1(this_data,data.fsample,0);
             
             for nE=1:size(this_data,1)
                 all_Waves=[all_Waves ; [repmat([nS nB nE],length(abs(cell2mat(twa_results.channels(nE).maxnegpkamp))),1) abs(cell2mat(twa_results.channels(nE).maxnegpkamp))'+abs(cell2mat(twa_results.channels(nE).maxpospkamp))' ...
@@ -61,7 +61,7 @@ for nS=1:length(List_Subj)
         end
         labels=data.label;
         Fs=data.fsample;
-        save([data_path filesep 'SW_all_' File_Name],'all_Waves','labels','Fs');
+        save([data_path filesep 'TW_all_' File_Name],'all_Waves','labels','Fs');
     else
         fprintf('... skipping %s (%g/%g)\n',File_Name,nS,length(List_Subj))
     end

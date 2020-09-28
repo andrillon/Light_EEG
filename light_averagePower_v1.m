@@ -36,7 +36,7 @@ for nS=1:length(List_Subj)
         continue;
     end
     %     av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(:,:,TFRhann.freq>16,:),3),[1 1 size(TFRhann.powspctrm,3) 1])),4)));
-    av_logPower(nS,:,:,:)=(squeeze(mean(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30)),4)));
+    av_logPower(nS,:,:,:)=(squeeze(10*log10(mean(TFRhann.powspctrm(:,:,:,TFRhann.time<-30),4))));
     %     av_logPower_time(nS,:,:,:,:)=(squeeze(log(TFRhann.powspctrm(:,:,:,TFRhann.time<-30))));
     %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
     
