@@ -38,7 +38,7 @@ for nS=1:length(List_Subj)
     %%% parameters of SW detection
     paramSW.fixThr=[]; % if you want to use a fix threshold (eg 50) leave empty ([]) if you want to use the relative
     paramSW.prticle_Thr=90; % Choose percentile that you want to select: 80 or 90 or 95
-    paramSW.LimFrqW=[1 4]; % Freq range you want to select: [1 4] or [4 10] in Hz
+    paramSW.LimFrqW=[1 5]; % Freq range you want to select: [1 4] or [4 10] in Hz
     paramSW.AmpCriterionIdx=4; % Criterion to select waves on: 9 (MaxNegpkAmp) or 11 (MaxPosPeakAmp) or 4 (P2P)
     paramSW.art_ampl=150; % Rejection criterion
     paramSW.max_posampl=50; % Rejection criterion
@@ -80,8 +80,12 @@ for nS=1:length(List_Subj)
         end
         slow_Waves=[slow_Waves ; thisE_Waves(temp_p2p>thr_Wave,:)];
     end
+%     slow_freq=1./(abs((slow_Waves(:,5)-slow_Waves(:,7)))./Fs);
+%     fprintf('... ... %g %% slow waves discarded because of frequency\n',mean(slow_freq>paramSW.LimFrqW(2))*100)
+%     slow_Waves(slow_freq>paramSW.LimFrqW(2),:)=[];
     File_Name2=File_Name(bound{1}(2)+1:end);
-    save([data_path filesep 'SW_90P2PbyE_baseline_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+        save([data_path filesep 'SW_90P2PbyE_baseline_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
+%     save([data_path filesep 'SW_fixThr_baseline_' File_Name2(1:end-4)],'slow_Waves','labels','Fs','paramSW');
     
 end
 

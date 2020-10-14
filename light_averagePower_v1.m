@@ -80,38 +80,47 @@ for nCond=1:2
     ylabel('log(Power)');
     legend(hp,{'B0','B1','B2','B3','B4'});
     title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-%     ylim([-4 6])
+    ylim([-20 5])
 end
 
 
 %%
-theseChLabels={'Fz','Cz','Pz','Oz'};
-figure; set(gcf,'Position',[ 1     7   996   798]);
-for nChan=1:length(theseChLabels)
-    subplot(2,2,nChan);
-    thisChLabel=theseChLabels{nChan};
-    for nCond=1:2
-        hold on;
-        hp=[];
-        for nBl=1:5
+theseChLabels={'Fz','Cz','Oz'};
+figure; set(gcf,'Position',[ 1           7        1482         798]);
+for nBl=1:5
+    for nChan=1:length(theseChLabels)
+        subplot(3,5,5*(nChan-1)+nBl);
+        thisChLabel=theseChLabels{nChan};
+        for nCond=1:2
+            hold on;
+            hp=[];
             temp_pow=squeeze(av_logPower(CondSubj==Conds{nCond},nBl,match_str(TFRhann.label,thisChLabel),:));
             if nCond==1 && nBl==1
-                simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
+%                 simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'--',0.5,1,0,0,2);
+plot(freqs,mean(temp_pow),'Color',Colors{nCond}(nBl,:),'LineStyle','--','LineWidth',3)
             else
-                simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+%                 simpleTplot(freqs,(temp_pow),0,Colors{nCond}(nBl,:),0,'-',0.5,1,0,0,2);
+ plot(freqs,mean(temp_pow),'Color',Colors{nCond}(nBl,:),'LineStyle','-','LineWidth',3)
+           end
+            format_fig;
+            if nChan==length(theseChLabels)
+                xlabel('Freq (Hz)');
             end
+            if nBl==1
+                ylabel(sprintf('log(Power) %s',theseChLabels{nChan}));
+            end
+            %             %     legend(hp,{'B0','B1','B2','B3','B4'});
+            if nChan==1
+                title(sprintf('Block %g',nBl));
+            end
+            ylim([-20 5])
+            xlim([1 30])
         end
-        format_fig;
-        xlabel('Freq (Hz)');
-        ylabel('log(Power)');
-        %     legend(hp,{'B0','B1','B2','B3','B4'});
-        title(sprintf('%s - %s',Conds{nCond},thisChLabel));
-        %     ylim([-5.5 0])
-        xlim([1 30])
     end
 end
+
 %%
-FOI=[6 11]; % Freq Band of Interest
+FOI=[20 30]; % Freq Band of Interest
 figure; set(gcf,'Position',[64          33        1097         952]);
 for nCond=1:2
     for nB=1:5
@@ -121,7 +130,8 @@ for nCond=1:2
         simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
         title(sprintf('%s',Conds{nCond}));
         colorbar;
-        caxis([-3 -1.5]);
+        %         caxis([-3 -1.5]);
+        %         caxis([-1 1]*max(abs(Pow_AVG)));
         format_fig;
     end
 end
@@ -134,7 +144,8 @@ for nB=1:5
     simpleTopoPlot_ft(Pow_AVG, layout,'on',[],0,1);
     title(sprintf('%s','D - E'));
     colorbar;
-    caxis([-1 1]*.5);
+    %     caxis([-1 1]*.5);
+    caxis([-1 1]*max(abs(Pow_AVG)));
     format_fig;
 end
 

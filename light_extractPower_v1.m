@@ -15,6 +15,7 @@ load('cain_elecloc_32ch_layout.mat');
 List_Subj=dir([data_path filesep 'CIfre_ft_*.mat']);
 
 %% Loop across participants to extract power
+reference_method='laplacian';
 for nS=1:length(List_Subj)
     
     %%% load data
@@ -22,7 +23,23 @@ for nS=1:length(List_Subj)
     File_Path = List_Subj(nS).folder;
     load([data_path filesep File_Name]);
     
-    
+    if strcmp(reference_method,'mastoids')
+        cfg=[];
+        cfg.reref      = 'yes';
+        cfg.refchannel = {'TP9','TP10'};
+        data = ft_preprocessing(cfg,data);
+        
+    elseif strcmp(reference_method,'laplacian')
+        cfg=[];
+        cfg.method       = 'spline';
+        elec = ft_read_sens('cain_elecloc_32ch.sfp');
+        elec.label{match_str(elec.label,'Tp10')}='TP10';
+        cfg.elec         = elec;
+        cfg.trials       = 'all';
+        cfg.order        = 4;
+        cfg.degree       = 14;
+        [data3] = ft_scalpcurrentdensity(cfg, data);
+    end
     %%% extract Power
     cfg              = [];
     cfg.output       = 'pow';
@@ -34,7 +51,12 @@ for nS=1:length(List_Subj)
     cfg.toi          = [-4*60:0.5:0];                         % time
     cfg.keeptrials  = 'yes';
     TFRhann = ft_freqanalysis(cfg, data);
-    save([data_path filesep 'TF' File_Name],'TFRhann','cfg');
-
-%     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
+    if strcmp(reference_method,'mastoids')
+        save([data_path filesep 'mastTF' File_Name],'TFRhann','cfg');
+    elseif strcmp(reference_method,'laplacian')
+        save([data_path filesep 'laplTF' File_Name],'TFRhann','cfg');
+    else
+        save([data_path filesep 'TF' File_Name],'TFRhann','cfg');
+    end
+    %     TFRhann.powspctrm_norm=10*log(TFRhann.powspctrm./repmat(mean(TFRhann.powspctrm(1,:,:,:),4),[size(TFRhann.powspctrm,1) 1 1 size(TFRhann.powspctrm,4)]));
 end

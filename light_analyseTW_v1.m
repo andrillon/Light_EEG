@@ -66,6 +66,10 @@ table_SWall=array2table(SW_properties_all,'VariableNames',{'SubID','BlockN','Con
 table_SW.SubID=categorical(table_SW.SubID);
 table_SW.Cond=categorical(table_SW.Cond);
 table_SW.Elec=categorical(table_SW.Elec);
+for nEl=1:length(layout.label)-5
+    table_SW.Elec(table_SW.Elec==num2str(nEl))=layout.label{nEl};
+end
+table_SW.Elec=removecats(table_SW.Elec);
 table_SW.Cond(table_SW.Cond=='1')='E';
 table_SW.Cond(table_SW.Cond=='0')='D';
 table_SW.Cond=removecats(table_SW.Cond);
@@ -73,6 +77,11 @@ table_SW.Cond=removecats(table_SW.Cond);
 table_SWall.SubID=categorical(table_SWall.SubID);
 table_SWall.Cond=categorical(table_SWall.Cond);
 table_SWall.Elec=categorical(table_SWall.Elec);
+for nEl=1:length(layout.label)-5
+    table_SWall.Elec(table_SWall.Elec==num2str(nEl))=layout.label{nEl};
+end
+table_SWall.Elec=removecats(table_SWall.Elec);
+
 table_SWall.Cond(table_SWall.Cond=='1')='E';
 table_SWall.Cond(table_SWall.Cond=='0')='D';
 table_SWall.Cond=removecats(table_SWall.Cond);
@@ -104,17 +113,17 @@ Cond={'D','E'};
 for nC=1:2
         subplot(1,2,nC);
         Dens_AVG=[];
-        for nEl=1:32
+        for nEl=1:length(layout.label)-5
 %         Dens_AVG(nEl)= median((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.Elec == num2str(nEl))));%-...
-        Dens_AVG(nEl)= nanmean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ~= 1 & table_SW.Elec == num2str(nEl))));%-...
+        Dens_AVG(nEl)= nanmean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ~= 1 & table_SW.Elec == layout.label{nEl})));%-...
 %              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
         end
         
-        simpleTopoPlot_ft(Dens_AVG, layout,'labels',[],0,1);
+        simpleTopoPlot_ft(Dens_AVG', layout,'labels',[],0,1);
         title(sprintf('%s',Cond{nC}));
         colormap(cmap);
         colorbar;
-%         caxis([0 1]*5);
+        caxis([0 1]*2.5);
         format_fig;
 end
 
@@ -124,8 +133,8 @@ data=[];
 for nBl = 1:5
     for nC = 1:2
 %         data{nBl, nC} = (table_SWall.DensW(table_SWall.Cond == Cond(nC) & table_SWall.BlockN == (nBl)));
-        data{nBl, nC} = ((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ==nBl & table_SW.Elec == num2str(find(ismember(layout.label,'Cz'))))));
-         meandata(nBl, nC) =mean(data{nBl, nC}); %-data{1, nC});
+        data{nBl, nC} = table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN ==nBl & table_SW.Elec == 'Cz');
+         meandata(nBl, nC) =median(data{nBl, nC}); %-data{1, nC});
          semdata(nBl, nC) =sem(data{nBl, nC}); %-data{1, nC});
          
     end
@@ -142,7 +151,7 @@ scatter((1:5)+0.05,meandata(:,2),'Marker','o','SizeData',144,'MarkerEdgeColor',C
 legend(hb,{'D','E'})
 format_fig;
 xlabel('Block')
-ylabel('SW/min/elec (norm)')
+ylabel('TW/min/elec (norm)')
 % % make figure
 % figure;
 % cl=[Colors{2}(end,:) ; Colors{1}(end,:)];
@@ -168,15 +177,15 @@ cmap=cbrewer('seq','YlOrRd',64); % select a sequential colorscale from yellow to
 figure; set(gcf,'Position',[64          33        1097         952]);
 Cond={'D','E'};
 for nC=1:2
-    for nBl=2:5
-        subplot(2,4,4*(nC-1)+(nBl-1));
+    for nBl=1:5
+        subplot(2,5,5*(nC-1)+(nBl));
         Dens_AVG=[];
         for nEl=1:32
-        Dens_AVG(nEl)= mean((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl))));%-...
+        Dens_AVG(nEl)= median((table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (nBl) & table_SW.Elec == num2str(nEl))));%-...
 %              (table_SW.DensW(table_SW.Cond == Cond(nC) & table_SW.BlockN == (1) & table_SW.Elec == num2str(nEl))));
         end
         
-        simpleTopoPlot_ft(Dens_AVG, layout,'on',[],0,1);
+        simpleTopoPlot_ft(Dens_AVG', layout,'on',[],0,1);
         title(sprintf('%s - %g',Cond{nC},nBl));
         colormap(cmap);
         colorbar;
